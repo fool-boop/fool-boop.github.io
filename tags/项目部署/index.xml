@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>项目部署 on 叱月的小冰窖</title>
+    <link>https://fool-boop.github.io/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/</link>
+    <description>Recent content in 项目部署 on 叱月的小冰窖</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-Hans</language>
+    <lastBuildDate>Sat, 01 May 2021 14:53:49 +0800</lastBuildDate><atom:link href="https://fool-boop.github.io/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ruoyi开源项目部署</title>
+      <link>https://fool-boop.github.io/posts/ruoyi%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/</link>
+      <pubDate>Sat, 01 May 2021 14:53:49 +0800</pubDate>
+      
+      <guid>https://fool-boop.github.io/posts/ruoyi%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/</guid>
+      <description>&lt;h2 id=&#34;小集群项目部署&#34;&gt;小集群项目部署&lt;/h2&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

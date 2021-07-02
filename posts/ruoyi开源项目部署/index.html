@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Ruoyi开源项目部署 | 叱月的小冰窖</title>
+
+    
+<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+
+
+
+<meta name="author" content="叱月" />
+<meta name="description" content="小集群项目部署" />
+
+
+
+<meta name="generator" content="Hugo 0.82.1" />
+
+<link rel="canonical" href="https://fool-boop.github.io/posts/ruoyi%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" />
+
+
+<meta property="og:title" content="Ruoyi开源项目部署" />
+<meta property="og:description" content="小集群项目部署" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://fool-boop.github.io/posts/ruoyi%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" /><meta property="og:image" content="https://fool-boop.github.io/me/background.jpg"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-05-01T14:53:49&#43;08:00" />
+<meta property="article:modified_time" content="2021-05-01T14:53:49&#43;08:00" />
+
+
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://fool-boop.github.io/me/background.jpg"/>
+
+<meta name="twitter:title" content="Ruoyi开源项目部署"/>
+<meta name="twitter:description" content="小集群项目部署"/>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+<link rel="stylesheet" href="/css/icomoon.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@1.13.1/css/OverlayScrollbars.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css">
+<link rel="stylesheet" href="/css/site.css" />
+
+<style>
+  a:not(.ui.button):hover {
+    text-decoration: underline;
+  }
+
+  
+  a:not(.ui.button) {
+    color: seagreen !important;
+  }
+  
+
+  
+  .inverted a:not(.ui.button) {
+     color: darkseagreen !important;
+  }
+  
+
+  
+  body.default {
+    
+    background-color: #79c4ec;
+    
+
+    
+    background-image: url(/me/background.jpg);
+    
+  }
+  
+
+  
+  body.dark {
+    
+    background-color: #363636;
+    
+
+    
+    background-image: url(/me/background-dark.jpg);
+    
+  }
+  
+</style>
+
+
+    
+
+
+
+<link rel="stylesheet" data-highlight href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/tomorrow.min.css" />
+
+
+
+
+
+
+
+    
+    <link rel="stylesheet" href="/css/custom.css" />
+    
+  </head>
+
+  <body class="default">
+    
+<nav class="ui secondary menu dream-menu">
+
+  <div class="item">
+    <i class="large link bullseye icon dream-flip-toggle" title="翻转！"></i>
+  </div>
+  <div class="item">
+    <i class="large link home icon" title="首页" onclick="window.location.href = 'https:\/\/fool-boop.github.io'"></i>
+  </div>
+  
+  <div class="item">
+    <i class="large link icon theme-switch" onclick="themeSwitch()"></i>
+  </div>
+  
+  
+  <div class="item">
+    <i class="large link search icon" onclick="toggleSearch()"></i>
+  </div>
+  
+</nav>
+
+    <div class="flip-container">
+      <div class="flipper">
+        <section class="front">
+          <div class="dream-max-width">
+            
+<div class="ui relaxed centered grid dream-grid dream-grid-single">
+  
+  
+  
+  
+
+  
+  <aside class="sixteen wide mobile sixteen wide tablet three wide computer column dream-single-aside">
+  
+    
+    <div class="ui segment toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#小集群项目部署">小集群项目部署</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#1nodejsjdkmaven安装">1.node.js+jdk+Maven安装</a></li>
+    <li><a href="#2nginxtomcatmysqlredis配置">2.Nginx+Tomcat+Mysql+Redis配置：</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#1-后端打包">1. 后端打包</a></li>
+    <li><a href="#2前端打包">2.前端打包：</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#1nginx配置">1.Nginx配置：</a></li>
+    <li><a href="#2tomcat配置">2.Tomcat配置：</a></li>
+    <li><a href="#3配置mysql">3.配置Mysql</a></li>
+  </ul>
+</nav>
+    </div>
+    
+
+    
+  
+  </aside>
+  
+  <div class="sixteen wide mobile sixteen wide tablet ten wide computer column markdown-body dream-single" id="dream-save-post-as-img">
+    <section class="ui top attached segment">
+      <header>
+        <h1 class="ui large header">Ruoyi开源项目部署<div class="sub header">
+            <div class="left">
+              @
+              
+                
+                  <a href="https://fool-boop.github.io" target="_blank">叱月</a>
+                
+              
+
+              | 
+                  <span data-format="luxon">2021-05-01T14:53:49&#43;08:00</span>
+                
+
+              | 3 分钟阅读
+
+              
+              | 更新于
+                
+                  <span data-format="luxon">2021-05-01T14:53:49&#43;08:00</span>
+                
+              
+            </div>
+
+            
+            <div class="dream-share">
+  <a href="#" class="save-as-image" title="保存为图片" onclick="savePostAsImg()">
+    <i class="save icon"></i>
+  </a>
+  <a href="https://twitter.com/intent/tweet?text=Ruoyi%e5%bc%80%e6%ba%90%e9%a1%b9%e7%9b%ae%e9%83%a8%e7%bd%b2&url=https%3a%2f%2ffool-boop.github.io%2fposts%2fruoyi%25E5%25BC%2580%25E6%25BA%2590%25E9%25A1%25B9%25E7%259B%25AE%25E9%2583%25A8%25E7%25BD%25B2%2f" title="Twitter">
+    <i class="twitter icon"></i>
+  </a>
+  <a href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ffool-boop.github.io%2fposts%2fruoyi%25E5%25BC%2580%25E6%25BA%2590%25E9%25A1%25B9%25E7%259B%25AE%25E9%2583%25A8%25E7%25BD%25B2%2f" title="Facebook">
+    <i class="facebook icon"></i>
+  </a>
+</div>
+
+            
+          </div>
+        </h1>
+      </header>
+
+      <article class="main">
+        
+        <img class="cover" src="/img/Ruoyi.jpg" />
+        
+
+        <h2 id="小集群项目部署">小集群项目部署</h2>
+<p><a href="https://gitee.com/y_project/RuoYi-Vue">Gitee下载地址</a></p>
+<blockquote>
+<p>本文用于记录在部署过程中遇见的错误，详细步骤参见<a href="https://www.bilibili.com/video/BV1uK411p7Bp">Codesheep视频</a></p>
+<p>集群部署图解：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE.5ug4que8dwo0.jpg" alt="思维导图"></p>
+</blockquote>
+<h1 id="1部署前的环境配置">1、部署前的环境配置：</h1>
+<h2 id="1nodejsjdkmaven安装">1.node.js+jdk+Maven安装</h2>
+<blockquote>
+<p><a href="https://nodejs.org/dist/v12.16.3/node-v12.16.3-linux-x64.tar.gz">node-v12.16.3下载地址</a></p>
+<p><a href="">JDK下载地址</a>：链接: <a href="https://pan.baidu.com/s/1tXQ74CIQcOSkjmRF2WwGCA">https://pan.baidu.com/s/1tXQ74CIQcOSkjmRF2WwGCA</a> 提取码: k5e2</p>
+<p><a href="">Maven下载地址</a>：链接: <a href="https://pan.baidu.com/s/1w8ADy2nwkpnLuVM1D1et-g">https://pan.baidu.com/s/1w8ADy2nwkpnLuVM1D1et-g</a> 提取码: 3shn</p>
+<p>​	安装lrzsz方便上传和下载文件：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">yum install lrzsz -y
+</code></pre></div><p>服务器中使用<code>rz -E</code>命令将下载好的文件上传。</p>
+<p>上传完毕后解压到指定路径配置其环境变量。</p>
+<p>解压：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">tar -vxzf node-v12.16.3-linux-x64.tar.gz -C ../software
+tar -vxzf jdk-8u141-linux-x64.tar.gz -C ../software
+tar -vxzf apache-maven-3.6.3-bin.tar.gz -C ../software
+</code></pre></div><p>环境变量配置：</p>
+<blockquote>
+<p>vim 打开/etc/profile文件</p>
+</blockquote>
+<p>根据自己目录输入以下</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">export NODE_HOME<span style="color:#f92672">=</span>/home/jgx/software/node-v12.16.3-linux-x64
+export PATH<span style="color:#f92672">=</span>:$NODE_HOME/bin:$PATH
+
+export MAVEN_HOME<span style="color:#f92672">=</span>/home/jgx/software/apache-maven-3.6.3
+export PATH<span style="color:#f92672">=</span>:$MAVEN_HOME/bin:$PATH
+
+export JAVA_HOME<span style="color:#f92672">=</span>/home/jgx/software/jdk1.8.0_161
+export PATH<span style="color:#f92672">=</span>:$JAVA_HOME/bin:$PATH
+</code></pre></div><p>使环境变量生效：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">source /etc/profile
+</code></pre></div><p>配置完成之后查看各个软件包的版本号，测试安装是否成功：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">npm -v
+node -v
+</code></pre></div><p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/nodenpm.6zeflmszgc00.jpg" alt="nodenpm"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">java -v
+</code></pre></div><p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/Javaverison.2xxx57lx41q0.jpg" alt="Javaverison"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">mvn -v
+</code></pre></div><p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/mvn.17nzrxmar60w.jpg" alt="mvn"></p>
+<p>Maven切换阿里更新源：</p>
+<p>vim 打开/home/jgx/software/apache-maven-3.6.3/conf/settings.xml文件，在<mirrors></mirrors>中间加入以下内容（大约在160行左右）：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">&lt;mirror&gt;
+&lt;id&gt;alimaven&lt;/id&gt;
+&lt;name&gt;aliyun maven&lt;/name&gt;
+&lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;
+&lt;mirrorOf&gt;central&lt;/mirrorOf&gt;
+&lt;/mirror&gt;
+</code></pre></div></blockquote>
+<h2 id="2nginxtomcatmysqlredis配置">2.Nginx+Tomcat+Mysql+Redis配置：</h2>
+<hr>
+<blockquote>
+<p>为了方便Mysql+Redis我使用的是Docker部署，nginx和tomcat的编译源码包可直接去官网下载：</p>
+<p>Mysql部署：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --name Mysql -d -it -p 3306:3306 -e MYSQL_ROOT_PASSWORD<span style="color:#f92672">=</span>jgx123 --restart<span style="color:#f92672">=</span>always mysql:5.7
+</code></pre></div><p>Redis部署:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --name Redis -d -p 6379:6379 --restart<span style="color:#f92672">=</span>always redis:latest
+</code></pre></div><p>Nginx编译安装：</p>
+<p>安装编译需要的软件包：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">yum -y install make zlib zlib-devel gcc-c++ libtool  openssl openssl-devel
+</code></pre></div><p>进入到解压后的目录分别执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">./configure
+
+make <span style="color:#f92672">&amp;&amp;</span> make install 
+</code></pre></div><p>默认安装目录：/usr/local/nginx</p>
+</blockquote>
+<h1 id="2项目打包">2、项目打包</h1>
+<h2 id="1-后端打包">1. 后端打包</h2>
+<p>指定字符集编码格式：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/%E7%BC%96%E7%A0%81%E6%A0%BC%E5%BC%8F.3pb8zyyll7k0.jpg" alt="编码格式"></p>
+<p>Mysql配置：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/Mysql.4j7yc7gopxm0.jpg" alt="Mysql"></p>
+<p>Redis配置：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/redis.2figxexgymf4.jpg" alt="redis"></p>
+<p>日志文件指定目录：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/%E6%97%A5%E5%BF%97.3mc7wlwd7zc0.jpg" alt="日志"></p>
+<p>内嵌Web容器剔除：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/tomcat.3dlbxwpsdco0.jpg" alt="tomcat"></p>
+<p>新建一个Java class指向RuoYiApplication.class：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/tomcat2.32urflpbj7i0.jpg" alt="tomcat2"></p>
+<p>将项目文件打包上传到服务器并解压，进入ruoyi-admin文件夹用Maven打包：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">mvn package
+<span style="color:#75715e">#打完之后的路径是./ruoyi-admin//target/</span>
+</code></pre></div><h2 id="2前端打包">2.前端打包：</h2>
+<p>进入解压的Ruoyi-Vue文件夹，按次序执行以下命令：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e">#指定淘宝安装源//cnpm打包容易出错不建议使用</span>
+npm install --unsafe-perm  --registry<span style="color:#f92672">=</span>https://registry.npm.taobao.org
+<span style="color:#75715e">#构建生产环境包</span>
+npm run build:prod
+<span style="color:#75715e">#打完之后的目录是./ruoyi-yi/dist/</span>
+</code></pre></div><p>将前端的dist目录移动至nginx的html目录下，war包移动至tomcat的webapps目录下。</p>
+<h1 id="3nginxtomcatmysql配置">3、Nginx+Tomcat+Mysql配置：</h1>
+<h2 id="1nginx配置">1.Nginx配置：</h2>
+<blockquote>
+<p>1.1 权限配置：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/Nginx1.421w8bjza6u0.jpg" alt="Nginx1"></p>
+<p>1.2 设置Nginx根目录</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/nginx2.2zr06zosyck0.jpg" alt="nginx2"></p>
+<p>配置之后启动nginx，会发现前端的接口错误，需要配置反向代理</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/api.3plzde1yaus0.jpg" alt="api"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e">#检查配置文件争取还是错误</span>
+/usr/local/nginx/sbin -t 
+<span style="color:#75715e">#启动</span>
+/usr/local/nginx/sbin
+</code></pre></div><p>1.3  配置prod-api的反向代理</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/nginx4.1oacxy7t39mo.jpg" alt="nginx4"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">location /prod-api/	<span style="color:#f92672">{</span>
+  proxy_set_header Host $http_host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header REMOTE-HOST $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_pass http://ruoyi/;<span style="color:#75715e">#指向被配置的负载均衡upstream</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>1.4 配置负载均衡，设置权重（值越大优先权越大）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/nginx3.3hwt12kvrzo0.jpg" alt="nginx3"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">upstream ruoyi<span style="color:#f92672">{</span>
+  server 192.168.100.61:8080 weight<span style="color:#f92672">=</span>3;
+  server 192.168.100.62:8080 weight<span style="color:#f92672">=</span>5;
+<span style="color:#f92672">}</span>
+</code></pre></div></blockquote>
+<h2 id="2tomcat配置">2.Tomcat配置：</h2>
+<blockquote>
+<p>1.1 设置Tomcat访问首页的根目录</p>
+<p>vim 打开/home/jgx/software/apache-tomcat-9.0.45/conf/server.xml文件根据自己目录情况添加以下内容：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">  	&lt;Context path<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/&#34;</span> docBase<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/home/jgx/software/apache-tomcat-9.0.45/webapps/ruoyi-admin&#34;</span> reloadable<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;false&#34;</span>&gt;&lt;/Context&gt;
+</code></pre></div><p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/tomcat1.djt1dxscklk.jpg" alt="tomcat1"></p>
+</blockquote>
+<h2 id="3配置mysql">3.配置Mysql</h2>
+<blockquote>
+<p>3.1 创建数据库ry-vue</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/mysqlvue.w0mvpq6gd34.jpg" alt="mysqlvue"></p>
+<p>3.2 导入项目中的sql文件：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/sql%E6%96%87%E4%BB%B6.595oro21idg0.jpg" alt="sql文件"></p>
+<p>重新启动Tomecat和Nginx:</p>
+<pre><code>/usr/local/nginx/sbin -s reload
+/home/jgx/software/apache-tomcat-9.0.45/bin/shutdown.sh
+/home/jgx/software/apache-tomcat-9.0.45/bin/startup.sh
+</code></pre></blockquote>
+<h1 id="4完成">4、完成~~</h1>
+<p>192.168.100.61Tomcat：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/61.3kgrs7cj18y0.jpg" alt="61"></p>
+<p>192.168.100.62Tomcat：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/62.lgyi29xj0wg.jpg" alt="62"></p>
+<p>192.168.100.61Nginx：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/61.1.58e0pfvmveg0.jpg" alt="61"></p>
+<p>故意输错验证码测试负载均衡：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">tail -f /home/jgx/software/logs/logssys-info.log
+</code></pre></div><p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Ruoyi/yanzhengma.1fe93yeb8yzk.jpg" alt="yanzhengma"></p>
+      </article>
+    </section>
+
+    
+    <article class="ui segment post-disqus-area" data-html2canvas-ignore>
+      <div id="disqus_thread"></div>
+      <script>
+        
+
+
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/fool-boop.github.io\/posts\/ruoyi%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2\/';  
+          this.page.identifier = '\/posts\/ruoyi%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2\/'; 
+        };
+
+        (function() { 
+          var d = document, s = d.createElement('script');
+          s.src = 'https://' + '...' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </article>
+    
+
+    
+    <article class="ui segment utterances-comments" data-html2canvas-ignore>
+      <script
+        src="https://utteranc.es/client.js"
+        repo="fool-boop/fool-boop.github.io"
+        issue-term="og:title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+      </script>
+    </article>
+    
+
+    
+  </div>
+</div>
+
+
+            <footer class="ui basic center aligned segment" style="background-color: transparent;">
+              
+              <p>© 2021 叱月的小冰窖</p>
+              
+
+
+              
+            </footer>
+          </div>
+        </section>
+        <section class="back">
+          <div class="dream-max-width">
+            <header class="ui basic very padded segment dream-header">
+  
+  <div class="ui small circular image">
+    <img src="/me/head.jpeg" alt="avatar" />
+  </div>
+  
+
+  <div class="content">
+    <h1 class="ui medium header">叱月的个人博客<div class="sub header">有一天，蜗牛也会变“佬”……</div>
+    </h1>
+
+    <article class="ui horizontal list">
+      
+      <a class="item" href="/posts">
+        <i class="archive icon" title="归档"></i>
+      </a>
+      
+      <a class="item" href="/categories">
+        <i class="th list icon" title="所有分类"></i>
+      </a>
+      <a class="item" href="/tags">
+        <i class="tags icon" title="所有标签"></i>
+      </a>
+    </article>
+
+    
+    
+    
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+    
+
+    
+
+    
+    
+    
+          <div class="dream-tags">
+          
+          
+          
+            <a class="ui label" href="/tags/docker/" title="Docker">
+              Docker
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/kali%E6%B8%97%E9%80%8F/" title="Kali渗透">
+              Kali渗透
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/mysql/" title="Mysql">
+              Mysql
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/ruoyi/" title="Ruoyi">
+              Ruoyi
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E4%BC%98%E5%8C%96/" title="优化">
+              优化
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E5%AE%B9%E5%99%A8%E5%8C%96/" title="容器化">
+              容器化
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E6%84%9F%E6%A6%82/" title="感概">
+              感概
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" title="网络安全">
+              网络安全
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" title="项目部署">
+              项目部署
+            </a>
+          
+          </div>
+    
+
+    
+  </div>
+</header>
+
+
+<div class="ui relaxed grid dream-grid dream-back">
+  
+  
+  
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article class="ui segment markdown-body">
+      <div class="ui medium header">关于我</div>
+      <p>叱月❤️的 ❤️ 博客</p>
+<p>记录一些技术上的事</p>
+<p>一名大四学生🕯️</p>
+<p><del>马上毕业于青岛理工大学琴岛学院</del></p>
+<p>&ndash; 2021 年 07 月 2 日更新</p>
+
+    </article>
+  </div>
+  
+
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article class="ui segment">
+      <div class="ui medium header">社交链接</div>
+      <nav class="ui secondary menu dream-menu dream-socials">
+  
+
+  
+  <div class="item">
+    <a href="mailto:wtl3577@163.com">
+      <i class="large mail icon" title="Email"></i>
+    </a>
+  </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <div class="item">
+    <a href="https://github.com/fool-boop" target="_blank">
+      <i class="large github icon" title="GitHub"></i>
+    </a>
+  </div>
+  
+
+  
+
+  
+</nav>
+
+    </article>
+  </div>
+
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    
+  </div>
+
+  
+  
+</div>
+
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+  window.defaultDark =  null 
+  window.backgroundDark = "#363636"
+  window.backgroundImageDark = "/me/background-dark.jpg"
+  window.darkNav =  null 
+  window.hasTwitterEmbed =  null 
+  window.maxTags =  null 
+
+  if (window.hasTwitterEmbed) {
+    
+    window.twttr = (function (d, s, id) {
+      var js,
+        fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {}
+      if (d.getElementById(id)) return t
+      js = d.createElement(s)
+      js.id = id
+      js.src = 'https://platform.twitter.com/widgets.js'
+      fjs.parentNode.insertBefore(js, fjs)
+
+      t._e = []
+      t.ready = function (f) {
+        t._e.push(f)
+      }
+
+      return t
+    })(document, 'script', 'twitter-wjs')
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@1.13.1/js/jquery.overlayScrollbars.min.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/theme.js"></script>
+
+    
+
+
+<script src="https://cdn.jsdelivr.net/npm/luxon@1.26.0/build/global/luxon.min.js"></script>
+
+<script>
+  format()
+
+  function format() {
+    $('span[data-format="luxon"]').each(function () {
+      var date = $(this).text()
+
+      $(this).text(luxon.DateTime.fromISO(date, { locale: "zh" }).toFormat("yyyy年MM月dd日"))
+    })
+  }
+</script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/languages/clojure.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/languages/ocaml.min.js"></script>
+
+
+
+<script>
+  hljs.initHighlightingOnLoad()
+  setHighlightTheme()
+
+  function setHighlightTheme() {
+    var isDark = localStore.getItem('hugo-theme-dream-is-dark')
+    isDark = isDark ? isDark : window.defaultDark ? 'y' : isDark
+
+    var lightTheme = "tomorrow"
+    var darkTheme = "tomorrow-night"
+    var theme = isDark === 'y' ? darkTheme : lightTheme
+
+    $('link[data-highlight]').attr('href', 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/' + theme + '.min.css')
+    $('pre').css('background', isDark === 'y' ? '#333' : '')
+  }
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.1/dist/html2canvas.min.js"></script>
+<script src="/js/post.js" defer></script>
+
+
+    
+    <div class="ui inverted segment" id="dream-search">
+  <div class="ui search">
+    <div class="ui transparent input">
+      <input class="prompt" type="text" placeholder="搜索一下" />
+    </div>
+    <div class="results"></div>
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    $.getJSON('https:\/\/fool-boop.github.io/index.json', function (data) {
+      $('.ui.search').search({
+        source: data,
+        searchFields: ['title'],
+        showNoResults: true,
+      })
+    })
+  })
+</script>
+<script src="/js/search.js"></script>
+
+    
+
+    
+
+    
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', '...', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+  </body>
+</html>

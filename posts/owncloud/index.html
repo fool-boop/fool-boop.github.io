@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Docker | 叱月的小冰窖</title>
+
+    
+<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+
+
+
+<meta name="author" content="叱月" />
+<meta name="description" content="Docker部署过程之中遇见的问题和备忘录" />
+
+
+
+<meta name="generator" content="Hugo 0.82.1" />
+
+<link rel="canonical" href="https://fool-boop.github.io/posts/owncloud/" />
+
+
+<meta property="og:title" content="Docker" />
+<meta property="og:description" content="Docker部署过程之中遇见的问题和备忘录" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://fool-boop.github.io/posts/owncloud/" /><meta property="og:image" content="https://fool-boop.github.io/me/background.jpg"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-04-26T14:21:39&#43;08:00" />
+<meta property="article:modified_time" content="2021-04-26T14:21:39&#43;08:00" />
+
+
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://fool-boop.github.io/me/background.jpg"/>
+
+<meta name="twitter:title" content="Docker"/>
+<meta name="twitter:description" content="Docker部署过程之中遇见的问题和备忘录"/>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+<link rel="stylesheet" href="/css/icomoon.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@1.13.1/css/OverlayScrollbars.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css">
+<link rel="stylesheet" href="/css/site.css" />
+
+<style>
+  a:not(.ui.button):hover {
+    text-decoration: underline;
+  }
+
+  
+  a:not(.ui.button) {
+    color: seagreen !important;
+  }
+  
+
+  
+  .inverted a:not(.ui.button) {
+     color: darkseagreen !important;
+  }
+  
+
+  
+  body.default {
+    
+    background-color: #79c4ec;
+    
+
+    
+    background-image: url(/me/background.jpg);
+    
+  }
+  
+
+  
+  body.dark {
+    
+    background-color: #363636;
+    
+
+    
+    background-image: url(/me/background-dark.jpg);
+    
+  }
+  
+</style>
+
+
+    
+
+
+
+<link rel="stylesheet" data-highlight href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/tomorrow.min.css" />
+
+
+
+
+
+
+
+    
+    <link rel="stylesheet" href="/css/custom.css" />
+    
+  </head>
+
+  <body class="default">
+    
+<nav class="ui secondary menu dream-menu">
+
+  <div class="item">
+    <i class="large link bullseye icon dream-flip-toggle" title="翻转！"></i>
+  </div>
+  <div class="item">
+    <i class="large link home icon" title="首页" onclick="window.location.href = 'https:\/\/fool-boop.github.io'"></i>
+  </div>
+  
+  <div class="item">
+    <i class="large link icon theme-switch" onclick="themeSwitch()"></i>
+  </div>
+  
+  
+  <div class="item">
+    <i class="large link search icon" onclick="toggleSearch()"></i>
+  </div>
+  
+</nav>
+
+    <div class="flip-container">
+      <div class="flipper">
+        <section class="front">
+          <div class="dream-max-width">
+            
+<div class="ui relaxed centered grid dream-grid dream-grid-single">
+  
+  
+  
+  
+
+  
+  <aside class="sixteen wide mobile sixteen wide tablet three wide computer column dream-single-aside">
+  
+    
+    <div class="ui segment toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#docker部署过程之中遇见的问题和备忘录">Docker部署过程之中遇见的问题和备忘录</a></li>
+    <li><a href="#备忘录">备忘录</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#1事务文件完善">1、事务文件完善:</a></li>
+    <li><a href="#2url完善">2、URL完善：</a></li>
+  </ul>
+</nav>
+    </div>
+    
+
+    
+  
+  </aside>
+  
+  <div class="sixteen wide mobile sixteen wide tablet ten wide computer column markdown-body dream-single" id="dream-save-post-as-img">
+    <section class="ui top attached segment">
+      <header>
+        <h1 class="ui large header">Docker<div class="sub header">
+            <div class="left">
+              @
+              
+                
+                  <a href="https://fool-boop.github.io" target="_blank">叱月</a>
+                
+              
+
+              | 
+                  <span data-format="luxon">2021-04-26T14:21:39&#43;08:00</span>
+                
+
+              | 2 分钟阅读
+
+              
+              | 更新于
+                
+                  <span data-format="luxon">2021-04-26T14:21:39&#43;08:00</span>
+                
+              
+            </div>
+
+            
+            <div class="dream-share">
+  <a href="#" class="save-as-image" title="保存为图片" onclick="savePostAsImg()">
+    <i class="save icon"></i>
+  </a>
+  <a href="https://twitter.com/intent/tweet?text=Docker&url=https%3a%2f%2ffool-boop.github.io%2fposts%2fowncloud%2f" title="Twitter">
+    <i class="twitter icon"></i>
+  </a>
+  <a href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ffool-boop.github.io%2fposts%2fowncloud%2f" title="Facebook">
+    <i class="facebook icon"></i>
+  </a>
+</div>
+
+            
+          </div>
+        </h1>
+      </header>
+
+      <article class="main">
+        
+        <img class="cover" src="/img/docker.jpg" />
+        
+
+        <h2 id="docker部署过程之中遇见的问题和备忘录">Docker部署过程之中遇见的问题和备忘录</h2>
+<h2 id="备忘录">备忘录</h2>
+<p>​    RewriteEngine on
+​    ReWriteCond %{SERVER_PORT} !^443$
+​    RewriteRule ^/(.*) https://%{HTTP_HOST}/$1 [NC,R,L]</p>
+<blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">chown -R www-data:www-data /var/www/html/owncloud/
+
+chmod <span style="color:#ae81ff">777</span> /var/www/html/owncloud/config/
+</code></pre></div></blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">    RewriteEngine on
+    ReWriteCond %<span style="color:#f92672">{</span>SERVER_PORT<span style="color:#f92672">}</span> !^443$
+    RewriteRule ^/<span style="color:#f92672">(</span>.*<span style="color:#f92672">)</span> https://%<span style="color:#f92672">{</span>HTTP_HOST<span style="color:#f92672">}</span>/$1 <span style="color:#f92672">[</span>NC,R,L<span style="color:#f92672">]</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run -itd -p 5299:5299 --name baidu -v /opt/BDdownload:/root/Downloads baiyuetribe/baiduyunpan
+</code></pre></div><p>#elatic search</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run -d --name elaticksearch -p <span style="color:#ae81ff">9200</span> -p 9300:9300 -e <span style="color:#e6db74">&#34;discovery.type=single-node&#34;</span> -e ES_JAVA_OPTS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-Xms64m -Xmx512m&#34;</span> elasticsearch:7.6.2
+</code></pre></div><hr>
+<h1 id="owncloud">Owncloud</h1>
+<p>关闭维护模式</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker exec -u www-data owncloud01 php occ maintenance:mode --off
+</code></pre></div><blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker tag 629533dcbf78 registry.cn-hangzhou.aliyuncs.com/jgx/docker_jgx:1.0
+docker push registry.cn-hangzhou.aliyuncs.com/jgx/docker_jgx:1.0
+</code></pre></div></blockquote>
+<h2 id="1事务文件完善">1、事务文件完善:</h2>
+<blockquote>
+<p>只有一个问题，官方提供的Docker镜像所使用的apt源并不完整，redis-server、php-redis一个也没有。经过一番研究，发现php扩展已经安装，只需要考虑Redis服务就行了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/fool_blog/%E4%BA%8B%E5%8A%A1%E6%96%87%E4%BB%B6.1ov78r9h22l.png" alt="事务文件"></p>
+<p>一个可行的方法是更换apt源，不过还有一个更好的方法：与单独运行Redis的容器互联，这样也符合了Docker构建服务的习惯做法。</p>
+<p>运行官方Redis镜像：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --name redis-server -d redis
+</code></pre></div><p>在运行ownCloud镜像时与Redis建立互联</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --name redis-server --link reids-server:redis -d owncloud：latest
+</code></pre></div><hr>
+<p>如果此时ownCloud已存在，则要将Redis与ownCloud主动建立互联：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --name redis-server --link owncloud:owncloud -d redis
+</code></pre></div><hr>
+<p>如果ownCloud容器使用的不是默认网桥（例如使用docker-composer建立），就需要将Redis添加到相应网桥中：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run --name redis-server --network <span style="color:#f92672">[</span>网桥名<span style="color:#f92672">]</span> -d redis
+</code></pre></div><p>修改ownCloud的配置文件，添加以下内容，注意“host&quot;后面要填容器名或容器ID：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#e6db74">&#39;memcache.local&#39;</span> <span style="color:#f92672">=</span>&gt; <span style="color:#e6db74">&#39;\OC\Memcache\Redis&#39;</span>,
+<span style="color:#e6db74">&#39;redis&#39;</span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>
+<span style="color:#e6db74">&#39;host&#39;</span> <span style="color:#f92672">=</span>&gt; <span style="color:#e6db74">&#39;redis&#39;</span>,
+<span style="color:#e6db74">&#39;port&#39;</span> <span style="color:#f92672">=</span>&gt; 6379,
+<span style="color:#f92672">]</span>,
+<span style="color:#e6db74">&#39;memcache.locking&#39;</span> <span style="color:#f92672">=</span>&gt; <span style="color:#e6db74">&#39;\OC\Memcache\Redis&#39;</span>,
+</code></pre></div><p>完成后，刷新ownCloud页面，可以看到有关内存缓存和事务文件锁定的错误已经消失：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/fool_blog/2.514w5fwa00k0.png" alt="2"></p>
+</blockquote>
+<h2 id="2url完善">2、URL完善：</h2>
+<p>config.php+OCC命令</p>
+<p>编辑config/config.php</p>
+<p>在config.php中设置规则，只需加入以下2行：</p>
+<pre><code>'overwrite.cli.url' =&gt; 'ownCloud/Nextcloud访问地址',
+'htaccess.RewriteBase' =&gt; '/',
+</code></pre><p>第一行一般已经存在，可以不再添加，如果和你当前的Nextcloud/ownCloud的访问地址不同，则要修改为当前地址。</p>
+<p>以下是一个config.php示例的部分内容，需要添加或修改的两行已用黄色标出</p>
+<pre><code>  'overwrite.cli.url' =&gt; 'http://192.168.3.3', 
+  'dbtype' =&gt; 'mysql',
+  'version' =&gt; '12.0.0.16',
+  'dbname' =&gt; 'nc',
+  'dbhost' =&gt; 'localhost',
+  'dbport' =&gt; '',
+  'dbtableprefix' =&gt; 'oc_',
+  'dbuser' =&gt; 'user',
+  'dbpassword' =&gt; 'password',
+  'installed' =&gt; true,
+  'htaccess.RewriteBase' =&gt; '/',
+</code></pre><p>现在可以将它保存了。</p>
+<p>使用OCC命令生成.htaccess文件</p>
+<p>别急着访问Nextcloud，我们只是添加了生成.htaccess的规则而已。现在要使用OCC命令重新生成.htaccess</p>
+<p>使用以下命令生成.htaccess文件：</p>
+<p>Ubuntu/Debian类系统</p>
+<pre><code>sudo -u www-data php occ maintenance:update:htaccess
+</code></pre><p>CentOS/RedHat：</p>
+<pre><code>sudo -u apache php occ maintenance:update:htaccess
+</code></pre><p>如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/fool_blog/update-htaccess.4vdtmz9ogbc0.png" alt="update-htaccess"></p>
+<p>访问你的Nextcloud，index.php已经消失了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/fool_blog/url%E5%AE%8C%E5%96%84.3xzdplr5dxm0.png" alt="url完善"></p>
+<blockquote>
+<p>去除文件：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#e6db74">&#39;skeletondirectory&#39;</span> <span style="color:#f92672">=</span>&gt; <span style="color:#e6db74">&#39;&#39;</span>,
+</code></pre></div></blockquote>
+      </article>
+    </section>
+
+    
+    <article class="ui segment post-disqus-area" data-html2canvas-ignore>
+      <div id="disqus_thread"></div>
+      <script>
+        
+
+
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/fool-boop.github.io\/posts\/owncloud\/';  
+          this.page.identifier = '\/posts\/owncloud\/'; 
+        };
+
+        (function() { 
+          var d = document, s = d.createElement('script');
+          s.src = 'https://' + '...' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </article>
+    
+
+    
+    <article class="ui segment utterances-comments" data-html2canvas-ignore>
+      <script
+        src="https://utteranc.es/client.js"
+        repo="fool-boop/fool-boop.github.io"
+        issue-term="og:title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+      </script>
+    </article>
+    
+
+    
+  </div>
+</div>
+
+
+            <footer class="ui basic center aligned segment" style="background-color: transparent;">
+              
+              <p>© 2021 叱月的小冰窖</p>
+              
+
+
+              
+            </footer>
+          </div>
+        </section>
+        <section class="back">
+          <div class="dream-max-width">
+            <header class="ui basic very padded segment dream-header">
+  
+  <div class="ui small circular image">
+    <img src="/me/head.jpeg" alt="avatar" />
+  </div>
+  
+
+  <div class="content">
+    <h1 class="ui medium header">叱月的个人博客<div class="sub header">有一天，蜗牛也会变“佬”……</div>
+    </h1>
+
+    <article class="ui horizontal list">
+      
+      <a class="item" href="/posts">
+        <i class="archive icon" title="归档"></i>
+      </a>
+      
+      <a class="item" href="/categories">
+        <i class="th list icon" title="所有分类"></i>
+      </a>
+      <a class="item" href="/tags">
+        <i class="tags icon" title="所有标签"></i>
+      </a>
+    </article>
+
+    
+    
+    
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+    
+
+    
+
+    
+    
+    
+          <div class="dream-tags">
+          
+          
+          
+            <a class="ui label" href="/tags/docker/" title="Docker">
+              Docker
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/kali%E6%B8%97%E9%80%8F/" title="Kali渗透">
+              Kali渗透
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/mysql/" title="Mysql">
+              Mysql
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/ruoyi/" title="Ruoyi">
+              Ruoyi
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E4%BC%98%E5%8C%96/" title="优化">
+              优化
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E5%AE%B9%E5%99%A8%E5%8C%96/" title="容器化">
+              容器化
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E6%84%9F%E6%A6%82/" title="感概">
+              感概
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" title="网络安全">
+              网络安全
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" title="项目部署">
+              项目部署
+            </a>
+          
+          </div>
+    
+
+    
+  </div>
+</header>
+
+
+<div class="ui relaxed grid dream-grid dream-back">
+  
+  
+  
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article class="ui segment markdown-body">
+      <div class="ui medium header">关于我</div>
+      <p>叱月❤️的 ❤️ 博客</p>
+<p>记录一些技术上的事</p>
+<p>一名大四学生🕯️</p>
+<p><del>马上毕业于青岛理工大学琴岛学院</del></p>
+<p>&ndash; 2021 年 07 月 2 日更新</p>
+
+    </article>
+  </div>
+  
+
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article class="ui segment">
+      <div class="ui medium header">社交链接</div>
+      <nav class="ui secondary menu dream-menu dream-socials">
+  
+
+  
+  <div class="item">
+    <a href="mailto:wtl3577@163.com">
+      <i class="large mail icon" title="Email"></i>
+    </a>
+  </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <div class="item">
+    <a href="https://github.com/fool-boop" target="_blank">
+      <i class="large github icon" title="GitHub"></i>
+    </a>
+  </div>
+  
+
+  
+
+  
+</nav>
+
+    </article>
+  </div>
+
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    
+  </div>
+
+  
+  
+</div>
+
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+  window.defaultDark =  null 
+  window.backgroundDark = "#363636"
+  window.backgroundImageDark = "/me/background-dark.jpg"
+  window.darkNav =  null 
+  window.hasTwitterEmbed =  null 
+  window.maxTags =  null 
+
+  if (window.hasTwitterEmbed) {
+    
+    window.twttr = (function (d, s, id) {
+      var js,
+        fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {}
+      if (d.getElementById(id)) return t
+      js = d.createElement(s)
+      js.id = id
+      js.src = 'https://platform.twitter.com/widgets.js'
+      fjs.parentNode.insertBefore(js, fjs)
+
+      t._e = []
+      t.ready = function (f) {
+        t._e.push(f)
+      }
+
+      return t
+    })(document, 'script', 'twitter-wjs')
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@1.13.1/js/jquery.overlayScrollbars.min.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/theme.js"></script>
+
+    
+
+
+<script src="https://cdn.jsdelivr.net/npm/luxon@1.26.0/build/global/luxon.min.js"></script>
+
+<script>
+  format()
+
+  function format() {
+    $('span[data-format="luxon"]').each(function () {
+      var date = $(this).text()
+
+      $(this).text(luxon.DateTime.fromISO(date, { locale: "zh" }).toFormat("yyyy年MM月dd日"))
+    })
+  }
+</script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/languages/clojure.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/languages/ocaml.min.js"></script>
+
+
+
+<script>
+  hljs.initHighlightingOnLoad()
+  setHighlightTheme()
+
+  function setHighlightTheme() {
+    var isDark = localStore.getItem('hugo-theme-dream-is-dark')
+    isDark = isDark ? isDark : window.defaultDark ? 'y' : isDark
+
+    var lightTheme = "tomorrow"
+    var darkTheme = "tomorrow-night"
+    var theme = isDark === 'y' ? darkTheme : lightTheme
+
+    $('link[data-highlight]').attr('href', 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/' + theme + '.min.css')
+    $('pre').css('background', isDark === 'y' ? '#333' : '')
+  }
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.1/dist/html2canvas.min.js"></script>
+<script src="/js/post.js" defer></script>
+
+
+    
+    <div class="ui inverted segment" id="dream-search">
+  <div class="ui search">
+    <div class="ui transparent input">
+      <input class="prompt" type="text" placeholder="搜索一下" />
+    </div>
+    <div class="results"></div>
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    $.getJSON('https:\/\/fool-boop.github.io/index.json', function (data) {
+      $('.ui.search').search({
+        source: data,
+        searchFields: ['title'],
+        showNoResults: true,
+      })
+    })
+  })
+</script>
+<script src="/js/search.js"></script>
+
+    
+
+    
+
+    
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', '...', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+  </body>
+</html>

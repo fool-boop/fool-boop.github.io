@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>优化 on 叱月的小冰窖</title>
+    <link>https://fool-boop.github.io/tags/%E4%BC%98%E5%8C%96/</link>
+    <description>Recent content in 优化 on 叱月的小冰窖</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-Hans</language>
+    <lastBuildDate>Tue, 27 Apr 2021 19:20:57 +0800</lastBuildDate><atom:link href="https://fool-boop.github.io/tags/%E4%BC%98%E5%8C%96/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mysql优化</title>
+      <link>https://fool-boop.github.io/posts/mysql%E4%BC%98%E5%8C%96/</link>
+      <pubDate>Tue, 27 Apr 2021 19:20:57 +0800</pubDate>
+      
+      <guid>https://fool-boop.github.io/posts/mysql%E4%BC%98%E5%8C%96/</guid>
+      <description>&lt;h2 id=&#34;mysql索引优化&#34;&gt;Mysql索引优化&lt;/h2&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

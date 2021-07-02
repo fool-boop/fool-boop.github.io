@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>叱月的小冰窖</title>
+    <link>https://fool-boop.github.io/</link>
+    <description>Recent content on 叱月的小冰窖</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-Hans</language>
+    <lastBuildDate>Fri, 02 Jul 2021 09:40:44 +0800</lastBuildDate><atom:link href="https://fool-boop.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MSF渗透框架使用</title>
+      <link>https://fool-boop.github.io/posts/msf%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Fri, 02 Jul 2021 09:40:44 +0800</pubDate>
+      
+      <guid>https://fool-boop.github.io/posts/msf%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8/</guid>
+      <description>&lt;h2 id=&#34;msf渗透工具使用&#34;&gt;MSF渗透工具使用&lt;/h2&gt;</description>
+    </item>
+    
+    <item>
+      <title>Ruoyi开源项目部署</title>
+      <link>https://fool-boop.github.io/posts/ruoyi%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/</link>
+      <pubDate>Sat, 01 May 2021 14:53:49 +0800</pubDate>
+      
+      <guid>https://fool-boop.github.io/posts/ruoyi%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/</guid>
+      <description>&lt;h2 id=&#34;小集群项目部署&#34;&gt;小集群项目部署&lt;/h2&gt;</description>
+    </item>
+    
+    <item>
+      <title>Mysql优化</title>
+      <link>https://fool-boop.github.io/posts/mysql%E4%BC%98%E5%8C%96/</link>
+      <pubDate>Tue, 27 Apr 2021 19:20:57 +0800</pubDate>
+      
+      <guid>https://fool-boop.github.io/posts/mysql%E4%BC%98%E5%8C%96/</guid>
+      <description>&lt;h2 id=&#34;mysql索引优化&#34;&gt;Mysql索引优化&lt;/h2&gt;</description>
+    </item>
+    
+    <item>
+      <title>Docker</title>
+      <link>https://fool-boop.github.io/posts/owncloud/</link>
+      <pubDate>Mon, 26 Apr 2021 14:21:39 +0800</pubDate>
+      
+      <guid>https://fool-boop.github.io/posts/owncloud/</guid>
+      <description>&lt;h2 id=&#34;docker部署过程之中遇见的问题和备忘录&#34;&gt;Docker部署过程之中遇见的问题和备忘录&lt;/h2&gt;</description>
+    </item>
+    
+    <item>
+      <title>我的第一篇博文</title>
+      <link>https://fool-boop.github.io/posts/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/</link>
+      <pubDate>Fri, 23 Apr 2021 19:59:50 +0800</pubDate>
+      
+      <guid>https://fool-boop.github.io/posts/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0/</guid>
+      <description>&lt;h2 id=&#34;没有如果只要现在还在一步一步走总会到终点&#34;&gt;没有如果，只要现在还在一步一步走总会到终点&lt;/h2&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

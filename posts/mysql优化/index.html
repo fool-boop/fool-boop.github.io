@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Mysql优化 | 叱月的小冰窖</title>
+
+    
+<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+
+
+
+<meta name="author" content="叱月" />
+<meta name="description" content="Mysql索引优化" />
+
+
+
+<meta name="generator" content="Hugo 0.82.1" />
+
+<link rel="canonical" href="https://fool-boop.github.io/posts/mysql%E4%BC%98%E5%8C%96/" />
+
+
+<meta property="og:title" content="Mysql优化" />
+<meta property="og:description" content="Mysql索引优化" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://fool-boop.github.io/posts/mysql%E4%BC%98%E5%8C%96/" /><meta property="og:image" content="https://fool-boop.github.io/me/background.jpg"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-04-27T19:20:57&#43;08:00" />
+<meta property="article:modified_time" content="2021-04-27T19:20:57&#43;08:00" />
+
+
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://fool-boop.github.io/me/background.jpg"/>
+
+<meta name="twitter:title" content="Mysql优化"/>
+<meta name="twitter:description" content="Mysql索引优化"/>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+<link rel="stylesheet" href="/css/icomoon.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@1.13.1/css/OverlayScrollbars.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css">
+<link rel="stylesheet" href="/css/site.css" />
+
+<style>
+  a:not(.ui.button):hover {
+    text-decoration: underline;
+  }
+
+  
+  a:not(.ui.button) {
+    color: seagreen !important;
+  }
+  
+
+  
+  .inverted a:not(.ui.button) {
+     color: darkseagreen !important;
+  }
+  
+
+  
+  body.default {
+    
+    background-color: #79c4ec;
+    
+
+    
+    background-image: url(/me/background.jpg);
+    
+  }
+  
+
+  
+  body.dark {
+    
+    background-color: #363636;
+    
+
+    
+    background-image: url(/me/background-dark.jpg);
+    
+  }
+  
+</style>
+
+
+    
+
+
+
+<link rel="stylesheet" data-highlight href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/tomorrow.min.css" />
+
+
+
+
+
+
+
+    
+    <link rel="stylesheet" href="/css/custom.css" />
+    
+  </head>
+
+  <body class="default">
+    
+<nav class="ui secondary menu dream-menu">
+
+  <div class="item">
+    <i class="large link bullseye icon dream-flip-toggle" title="翻转！"></i>
+  </div>
+  <div class="item">
+    <i class="large link home icon" title="首页" onclick="window.location.href = 'https:\/\/fool-boop.github.io'"></i>
+  </div>
+  
+  <div class="item">
+    <i class="large link icon theme-switch" onclick="themeSwitch()"></i>
+  </div>
+  
+  
+  <div class="item">
+    <i class="large link search icon" onclick="toggleSearch()"></i>
+  </div>
+  
+</nav>
+
+    <div class="flip-container">
+      <div class="flipper">
+        <section class="front">
+          <div class="dream-max-width">
+            
+<div class="ui relaxed centered grid dream-grid dream-grid-single">
+  
+  
+  
+  
+
+  
+  <aside class="sixteen wide mobile sixteen wide tablet three wide computer column dream-single-aside">
+  
+    
+    <div class="ui segment toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#mysql索引优化">Mysql索引优化</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#1什么是数据库">1、什么是数据库?</a></li>
+    <li><a href="#2mysql5732安装">2、Mysql5.7.32安装</a>
+      <ul>
+        <li><a href="#补充">补充</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-索引">3. 索引</a>
+      <ul>
+        <li><a href="#31">3.1</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+    
+
+    
+  
+  </aside>
+  
+  <div class="sixteen wide mobile sixteen wide tablet ten wide computer column markdown-body dream-single" id="dream-save-post-as-img">
+    <section class="ui top attached segment">
+      <header>
+        <h1 class="ui large header">Mysql优化<div class="sub header">
+            <div class="left">
+              @
+              
+                
+                  <a href="https://fool-boop.github.io" target="_blank">叱月</a>
+                
+              
+
+              | 
+                  <span data-format="luxon">2021-04-27T19:20:57&#43;08:00</span>
+                
+
+              | 3 分钟阅读
+
+              
+              | 更新于
+                
+                  <span data-format="luxon">2021-04-27T19:20:57&#43;08:00</span>
+                
+              
+            </div>
+
+            
+            <div class="dream-share">
+  <a href="#" class="save-as-image" title="保存为图片" onclick="savePostAsImg()">
+    <i class="save icon"></i>
+  </a>
+  <a href="https://twitter.com/intent/tweet?text=Mysql%e4%bc%98%e5%8c%96&url=https%3a%2f%2ffool-boop.github.io%2fposts%2fmysql%25E4%25BC%2598%25E5%258C%2596%2f" title="Twitter">
+    <i class="twitter icon"></i>
+  </a>
+  <a href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ffool-boop.github.io%2fposts%2fmysql%25E4%25BC%2598%25E5%258C%2596%2f" title="Facebook">
+    <i class="facebook icon"></i>
+  </a>
+</div>
+
+            
+          </div>
+        </h1>
+      </header>
+
+      <article class="main">
+        
+        <img class="cover" src="/img/mysql.jpg" />
+        
+
+        <h2 id="mysql索引优化">Mysql索引优化</h2>
+<h1 id="mysql的学习">Mysql的学习</h1>
+<h2 id="1什么是数据库">1、什么是数据库?</h2>
+<blockquote>
+<p>数据库（Database）是按照数据结构来组织、存储和管理数据的仓库。每个数据库都有一个或多个不同的 API 用于创建，访问，管理，搜索和复制所保存的数据。我们也可以将数据存储在文件中，但是在文件中读写数据速度相对较慢。所以，现在我们使用关系型数据库管理系统（RDBMS）来存储和管理大数据量。所谓的关系型数据库，是建立在关系模型基础上的数据库，借助于集合代数等数学概念和方法来处理数据库中的数据。</p>
+<p>MySQL 是一个关系型数据库管理系统，由瑞典 MySQL AB 公司开发，目前属于 Oracle 公司。MySQL 是一种关联数据库管理系统，关联数据库将数据保存在不同的表中，而不是将所有数据放在一个大仓库内，这样就增加了速度并提高了灵活性。</p>
+</blockquote>
+<h2 id="2mysql5732安装">2、Mysql5.7.32安装</h2>
+<p><a href="http://mirrors.sohu.com/mysql/">搜狐下载地址</a></p>
+<ol>
+<li>解压：</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">tar xvf mysql-5.7.32-1.el7.x86_64.rpm-bundle.tar -C ../software/Mysql
+</code></pre></div><p>安装之前使用以下命令检查系统之前是否存在Mysql或者Maridb-lib的软件包。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">rpm -qa | grep maridb
+</code></pre></div><p>如果有使用<code>yum remove</code>或者<code>rpm -e [软件包名称]--nodes</code>后加软件包名称</p>
+<p>解压之后有十个RPM软件包，使用以下命令进行安装。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">rpm -ivh mysql-*
+</code></pre></div><hr>
+<ol start="2">
+<li>报错的解决方法：（<a href="https://blog.csdn.net/qq_23167527/article/details/85236999">CSDN安装步骤</a>）</li>
+</ol>
+<blockquote>
+<ul>
+<li>2.1提示：perl(JSON) is needed by mysql-community-test-5.7.32-1.el7.x86_64：</li>
+</ul>
+<pre><code class="language-she" data-lang="she">yum install -y perl-JSON.noarch
+yum install -y perl.x86_64 perl-devel.x86_64
+</code></pre><ul>
+<li>2.2 
+libnuma.so.1()(64bit) is needed by mysql-community-server-8.0.13-1.el7.x86_64 libnuma.so.1(libnuma_1.1)(64bit) is needed by mysql-community-server-8.0.13-1.el7.x86_64 libnuma.so.1(libnuma_1.2)(64bit) is needed by mysql-community-server-8.0.13-1.el7.x86_64</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">yum install numactl -y
+</code></pre></div><ul>
+<li>2.3</li>
+</ul>
+<p>pkgconfig(openssl) is needed by mysql-community-devel-8.0.13-1.el7.x86_64</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">yum install openssl-devel.x86_64 openssl.x86_64 -y
+</code></pre></div><ul>
+<li>2.4
+perl(Data::Dumper) is needed by mysql-community-test-8.0.13-1.el7.x86_64</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">yum -y install autoconf
+</code></pre></div><p>解决报错的问题之后再使用<code>rpm -ivh mysql-*</code>进行安装。</p>
+<ul>
+<li>2.5</li>
+</ul>
+<p>mysql-community-client-5.7.32-1.el7.x86_64.rpm: Header V3 DSA/SHA1 Signature, key ID 5072e1f5: NOKEY</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">rpm -ivh mysql-community-client-5.7.32-1.el7.x86_64.rpm --force --nodeps
+</code></pre></div></blockquote>
+<ol start="3">
+<li>安装完成之后的配置：</li>
+</ol>
+<ul>
+<li>初始化数据库：</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">mysqld --initialize --console  
+</code></pre></div><ul>
+<li>启动mysql的服务：</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">systemctl start mysqld
+</code></pre></div><ul>
+<li>查看mysql服务的运行状态：</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">systemctl status mysqld
+</code></pre></div><ul>
+<li>获取mysql的初始密码（复制一下，待会登陆要用）：</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">cat /var/log/mysqld.log | grep password
+</code></pre></div><ul>
+<li>测试是否正常登陆mysql数据库</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">mysql -u root -p
+</code></pre></div><p>​	粘贴刚才复制的初始Mysql密码。</p>
+<ul>
+<li>更改初始Mysql密码</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">ALTER USER 用户名@主机名 identified by <span style="color:#e6db74">&#34;密码&#34;</span>
+alter user root@localhost identified by <span style="color:#e6db74">&#34;Xyt19981120.+&#34;</span>;
+</code></pre></div><ul>
+<li>授权远程登陆之后记得刷新权限,并且确定防火墙开启3306端口。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">grant all privileges on *.* to <span style="color:#e6db74">&#39;root&#39;</span>@<span style="color:#e6db74">&#39;%&#39;</span> identified by <span style="color:#e6db74">&#39;Xyt19981120.+&#39;</span> with grant option;
+flush privileges;
+</code></pre></div><ul>
+<li>关闭远程登陆的权限将%改为本地(localhost)</li>
+</ul>
+<h3 id="补充">补充</h3>
+<p>​	由于Mysql本身有密码策略，在学习时可改变其策略防止因简单密码而报错。</p>
+<blockquote>
+<p>set global validate_password_policy=0;//满足密码长度即可</p>
+<p>set global validate_password_length=6;//最低密码长度为6</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">set global validate_password_policy<span style="color:#f92672">=</span>0;
+set global validate_password_length<span style="color:#f92672">=</span>4;
+</code></pre></div><h2 id="3-索引">3. 索引</h2>
+<h3 id="31">3.1</h3>
+<p>索引的概述</p>
+<p>MYSQL官方对索引的定义为：索引（index）是帮助Mysql高级获取数据的数据结构（有序）。在数据之外，数据库系统还维护着，满足特定查找算法的数据结构，这些结构以某种当时引用（指向）数据，这样就可以在这些数据结构上实现高级查找算法，这种数据结构就是索引。</p>
+<p>索引的意图如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Mysql/%E7%B4%A2%E5%BC%95%E5%9B%BE.6n2r5wgc7s00.png" alt="索引图"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">show databases;
+</code></pre></div><p><img src="https://cdn.jsdelivr.net/gh/fool-boop/images@master/Mysql/%E6%9F%A5%E7%9C%8B.j6g1fbkqg7k.png" alt="查看"></p>
+<hr>
+<p>&ndash;持续更新中……</p>
+      </article>
+    </section>
+
+    
+    <article class="ui segment post-disqus-area" data-html2canvas-ignore>
+      <div id="disqus_thread"></div>
+      <script>
+        
+
+
+        var disqus_config = function () {
+          this.page.url = 'https:\/\/fool-boop.github.io\/posts\/mysql%E4%BC%98%E5%8C%96\/';  
+          this.page.identifier = '\/posts\/mysql%E4%BC%98%E5%8C%96\/'; 
+        };
+
+        (function() { 
+          var d = document, s = d.createElement('script');
+          s.src = 'https://' + '...' + '.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </article>
+    
+
+    
+    <article class="ui segment utterances-comments" data-html2canvas-ignore>
+      <script
+        src="https://utteranc.es/client.js"
+        repo="fool-boop/fool-boop.github.io"
+        issue-term="og:title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+      </script>
+    </article>
+    
+
+    
+  </div>
+</div>
+
+
+            <footer class="ui basic center aligned segment" style="background-color: transparent;">
+              
+              <p>© 2021 叱月的小冰窖</p>
+              
+
+
+              
+            </footer>
+          </div>
+        </section>
+        <section class="back">
+          <div class="dream-max-width">
+            <header class="ui basic very padded segment dream-header">
+  
+  <div class="ui small circular image">
+    <img src="/me/head.jpeg" alt="avatar" />
+  </div>
+  
+
+  <div class="content">
+    <h1 class="ui medium header">叱月的个人博客<div class="sub header">有一天，蜗牛也会变“佬”……</div>
+    </h1>
+
+    <article class="ui horizontal list">
+      
+      <a class="item" href="/posts">
+        <i class="archive icon" title="归档"></i>
+      </a>
+      
+      <a class="item" href="/categories">
+        <i class="th list icon" title="所有分类"></i>
+      </a>
+      <a class="item" href="/tags">
+        <i class="tags icon" title="所有标签"></i>
+      </a>
+    </article>
+
+    
+    
+    
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+    
+
+    
+
+    
+    
+    
+          <div class="dream-tags">
+          
+          
+          
+            <a class="ui label" href="/tags/docker/" title="Docker">
+              Docker
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/kali%E6%B8%97%E9%80%8F/" title="Kali渗透">
+              Kali渗透
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/mysql/" title="Mysql">
+              Mysql
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/ruoyi/" title="Ruoyi">
+              Ruoyi
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E4%BC%98%E5%8C%96/" title="优化">
+              优化
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E5%AE%B9%E5%99%A8%E5%8C%96/" title="容器化">
+              容器化
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E6%84%9F%E6%A6%82/" title="感概">
+              感概
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" title="网络安全">
+              网络安全
+            </a>
+          
+          
+          
+            <a class="ui label" href="/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" title="项目部署">
+              项目部署
+            </a>
+          
+          </div>
+    
+
+    
+  </div>
+</header>
+
+
+<div class="ui relaxed grid dream-grid dream-back">
+  
+  
+  
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article class="ui segment markdown-body">
+      <div class="ui medium header">关于我</div>
+      <p>叱月❤️的 ❤️ 博客</p>
+<p>记录一些技术上的事</p>
+<p>一名大四学生🕯️</p>
+<p><del>马上毕业于青岛理工大学琴岛学院</del></p>
+<p>&ndash; 2021 年 07 月 2 日更新</p>
+
+    </article>
+  </div>
+  
+
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    <article class="ui segment">
+      <div class="ui medium header">社交链接</div>
+      <nav class="ui secondary menu dream-menu dream-socials">
+  
+
+  
+  <div class="item">
+    <a href="mailto:wtl3577@163.com">
+      <i class="large mail icon" title="Email"></i>
+    </a>
+  </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <div class="item">
+    <a href="https://github.com/fool-boop" target="_blank">
+      <i class="large github icon" title="GitHub"></i>
+    </a>
+  </div>
+  
+
+  
+
+  
+</nav>
+
+    </article>
+  </div>
+
+  <div class="sixteen wide mobile eight wide tablet four wide computer column dream-column">
+    
+  </div>
+
+  
+  
+</div>
+
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+  window.defaultDark =  null 
+  window.backgroundDark = "#363636"
+  window.backgroundImageDark = "/me/background-dark.jpg"
+  window.darkNav =  null 
+  window.hasTwitterEmbed =  null 
+  window.maxTags =  null 
+
+  if (window.hasTwitterEmbed) {
+    
+    window.twttr = (function (d, s, id) {
+      var js,
+        fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {}
+      if (d.getElementById(id)) return t
+      js = d.createElement(s)
+      js.id = id
+      js.src = 'https://platform.twitter.com/widgets.js'
+      fjs.parentNode.insertBefore(js, fjs)
+
+      t._e = []
+      t.ready = function (f) {
+        t._e.push(f)
+      }
+
+      return t
+    })(document, 'script', 'twitter-wjs')
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@1.13.1/js/jquery.overlayScrollbars.min.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/theme.js"></script>
+
+    
+
+
+<script src="https://cdn.jsdelivr.net/npm/luxon@1.26.0/build/global/luxon.min.js"></script>
+
+<script>
+  format()
+
+  function format() {
+    $('span[data-format="luxon"]').each(function () {
+      var date = $(this).text()
+
+      $(this).text(luxon.DateTime.fromISO(date, { locale: "zh" }).toFormat("yyyy年MM月dd日"))
+    })
+  }
+</script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/languages/clojure.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/languages/ocaml.min.js"></script>
+
+
+
+<script>
+  hljs.initHighlightingOnLoad()
+  setHighlightTheme()
+
+  function setHighlightTheme() {
+    var isDark = localStore.getItem('hugo-theme-dream-is-dark')
+    isDark = isDark ? isDark : window.defaultDark ? 'y' : isDark
+
+    var lightTheme = "tomorrow"
+    var darkTheme = "tomorrow-night"
+    var theme = isDark === 'y' ? darkTheme : lightTheme
+
+    $('link[data-highlight]').attr('href', 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/' + theme + '.min.css')
+    $('pre').css('background', isDark === 'y' ? '#333' : '')
+  }
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.1/dist/html2canvas.min.js"></script>
+<script src="/js/post.js" defer></script>
+
+
+    
+    <div class="ui inverted segment" id="dream-search">
+  <div class="ui search">
+    <div class="ui transparent input">
+      <input class="prompt" type="text" placeholder="搜索一下" />
+    </div>
+    <div class="results"></div>
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    $.getJSON('https:\/\/fool-boop.github.io/index.json', function (data) {
+      $('.ui.search').search({
+        source: data,
+        searchFields: ['title'],
+        showNoResults: true,
+      })
+    })
+  })
+</script>
+<script src="/js/search.js"></script>
+
+    
+
+    
+
+    
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', '...', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+  </body>
+</html>
